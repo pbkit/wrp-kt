@@ -8,6 +8,7 @@ class WrpRequest(
     private val channel: WrpChannel,
     val methodName: String,
     val metadata: Metadata,
+    val reqId: String,
     val req: SharedFlow<ByteArray>
 ) {
     suspend fun sendHeader(value: Metadata) {}
