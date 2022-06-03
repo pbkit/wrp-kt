@@ -1,5 +1,10 @@
 plugins {
-    id("org.jetbrains.kotlin.jvm")
+    kotlin("jvm") version "1.6.21"
+}
+
+repositories {
+    mavenCentral()
+    google()
 }
 
 dependencies {
