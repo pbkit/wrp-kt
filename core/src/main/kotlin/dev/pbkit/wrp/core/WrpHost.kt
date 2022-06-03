@@ -9,7 +9,6 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onStart
-import kotlinx.coroutines.launch
 
 private class RequestHandlingState(
     val reqId: String,
@@ -88,13 +87,19 @@ class WrpHost(private val channel: WrpChannel, private val availableMethods: Set
                     is WrpMessage.Message.GuestReqFinish -> {
                         val (reqId) = msg.value
                         processMessage(channel, states, reqId) { state ->
-                            TODO()
                             state.reqFinished = true
                             tryForgetState(state)
                         }
                         null
                     }
-                    is WrpMessage.Message.GuestResFinish -> TODO()
+                    is WrpMessage.Message.GuestResFinish -> {
+                        val (reqId) = msg.value
+                        processMessage(channel, states, reqId) { state ->
+                            state.resFinished = true
+                            tryForgetState(state)
+                        }
+                        null
+                    }
                     else -> null
                 }
             }
