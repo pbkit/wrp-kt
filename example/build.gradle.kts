@@ -1,10 +1,6 @@
 plugins {
-    // kotlin("android") version "1.6.21"
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
-    // id("com.android.application") version "7.2.0" apply false
-    // id("com.android.library") version "7.2.0" apply false
-    // id("org.jetbrains.kotlin.android") version "1.5.31" apply false
 }
 
 android {
@@ -33,6 +29,7 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion = "1.2.0-beta03"
     }
+    namespace = "dev.pbkit.wrp.example"
 }
 
 dependencies {
