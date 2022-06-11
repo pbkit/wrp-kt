@@ -19,6 +19,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.viewinterop.AndroidView
+import dev.pbkit.wrp.core.WrpChannel
 import dev.pbkit.wrp.core.WrpSocket
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
@@ -57,6 +58,7 @@ fun Test() {
             },
             onSocketIsReady = { socket, _, url ->
                 Log.d("Wrp", "Socket is ready: $url")
+                val channel = WrpChannel(socket)
                 // TODO
             }
         )
