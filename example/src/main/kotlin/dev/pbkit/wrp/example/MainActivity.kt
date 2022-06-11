@@ -1,5 +1,6 @@
 package dev.pbkit.wrp.example
 
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.util.Log
 import android.webkit.JavascriptInterface
@@ -50,20 +51,29 @@ fun Test() {
             value = inputText.value,
             onValueChange = { inputText.value = it }
         )
-        WrpWebView() { socket, _, url ->
-            Log.d("Wrp", "Socket is ready: $url")
-            // TODO
-        }
+        WrpWebView(
+            update = { webView ->
+                webView.loadUrl("https://pbkit.dev/wrp-example-guest")
+            },
+            onSocketIsReady = { socket, _, url ->
+                Log.d("Wrp", "Socket is ready: $url")
+                // TODO
+            }
+        )
     }
 }
 
 @Composable
-fun WrpWebView(onSocketIsReady: (socket: WrpSocket, webView: WebView, url: String) -> Unit) {
+fun WrpWebView(
+    update: (WebView) -> Unit,
+    onSocketIsReady: (socket: WrpSocket, webView: WebView, url: String) -> Unit
+) {
     val scope = rememberCoroutineScope()
     AndroidView(factory = {
         WebView(it).apply {
             val queue = ArrayDeque<ByteArray>()
             var outerCont: Continuation<ByteArray?>? = null
+            var sessionCounter = 0
             settings.javaScriptEnabled = true
             addJavascriptInterface(
                 object : WrpJsInterface() {
@@ -97,14 +107,25 @@ fun WrpWebView(onSocketIsReady: (socket: WrpSocket, webView: WebView, url: Strin
                 }
             }
             webViewClient = object : WebViewClient() {
+                override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
+                    super.onPageStarted(view, url, favicon)
+                    queue.clear()
+                    outerCont?.resume(null)
+                    ++sessionCounter
+                }
+
                 override fun onPageFinished(view: WebView?, url: String?) {
                     super.onPageFinished(view, url)
                     if (view == null || url == null) return
+                    val currentSession = sessionCounter
                     scope.launch {
                         val handshakeResult = handshake()
+                        if (!handshakeResult) this.cancel()
                         onSocketIsReady(object : WrpSocket {
                             override suspend fun read(): ByteArray? = suspendCoroutine { cont ->
-                                if (queue.size > 0) {
+                                if (currentSession != sessionCounter) {
+                                    cont.resume(null)
+                                } else if (queue.size > 0) {
                                     val payload = queue.removeFirst()
                                     cont.resume(payload)
                                 } else {
@@ -122,9 +143,7 @@ fun WrpWebView(onSocketIsReady: (socket: WrpSocket, webView: WebView, url: Strin
                 }
             }
         }
-    }, update = {
-        it.loadUrl("https://pbkit.dev/wrp-example-guest")
-    })
+    }, update = update)
 }
 
 private abstract class WrpJsInterface {
