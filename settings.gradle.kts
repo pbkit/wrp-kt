@@ -1,6 +1,7 @@
 rootProject.name = "wrp-kt"
 include(":core")
 include(":example")
+include(":generator")
 
 pluginManagement {
     repositories {

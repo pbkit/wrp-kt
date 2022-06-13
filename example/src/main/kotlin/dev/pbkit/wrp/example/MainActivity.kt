@@ -19,11 +19,19 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.viewinterop.AndroidView
+import dev.pbkit.wrp.GetSliderValueRequest
+import dev.pbkit.wrp.GetSliderValueResponse
+import dev.pbkit.wrp.GetTextValueRequest
+import dev.pbkit.wrp.GetTextValueResponse
+import dev.pbkit.wrp.WrpExampleService
 import dev.pbkit.wrp.core.WrpChannel
 import dev.pbkit.wrp.core.WrpSocket
+import dev.pbkit.wrp.core.startWrpServer
+import dev.pbkit.wrp.serveWrpExampleService
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -56,10 +64,25 @@ fun Test() {
             update = { webView ->
                 webView.loadUrl("https://pbkit.dev/wrp-example-guest")
             },
-            onSocketIsReady = { socket, _, url ->
+            onSocketIsReady = { event ->
+                val url = event.url
                 Log.d("Wrp", "Socket is ready: $url")
-                val channel = WrpChannel(socket)
-                // TODO
+                startWrpServer(
+                    scope = event.webViewScope,
+                    channel = WrpChannel(event.socket),
+                    servers = arrayOf(
+                        serveWrpExampleService(object : WrpExampleService {
+                            override suspend fun GetSliderValue(req: GetSliderValueRequest): GetSliderValueResponse {
+                                Log.d("Wrp", "GetSliderValue called!")
+                                return GetSliderValueResponse(sliderValue.value.toInt())
+                            }
+                            override suspend fun GetTextValue(req: GetTextValueRequest): GetTextValueResponse {
+                                Log.d("Wrp", "GetTextValue called!")
+                                return GetTextValueResponse(inputText.value.text)
+                            }
+                        })
+                    )
+                )
             }
         )
     }
@@ -68,7 +91,7 @@ fun Test() {
 @Composable
 fun WrpWebView(
     update: (WebView) -> Unit,
-    onSocketIsReady: (socket: WrpSocket, webView: WebView, url: String) -> Unit
+    onSocketIsReady: (SocketIsReadyEvent) -> Unit
 ) {
     val scope = rememberCoroutineScope()
     AndroidView(factory = {
@@ -123,7 +146,7 @@ fun WrpWebView(
                     scope.launch {
                         val handshakeResult = handshake()
                         if (!handshakeResult) this.cancel()
-                        onSocketIsReady(object : WrpSocket {
+                        onSocketIsReady(SocketIsReadyEvent(this, object : WrpSocket {
                             override suspend fun read(): ByteArray? = suspendCoroutine { cont ->
                                 if (currentSession != sessionCounter) {
                                     cont.resume(null)
@@ -140,13 +163,20 @@ fun WrpWebView(
                                 evalJs("globalThis['<glue>'].recv($payload)")
                                 return true
                             }
-                        }, view, url)
+                        }, view, url))
                     }
                 }
             }
         }
     }, update = update)
 }
+
+class SocketIsReadyEvent(
+    val webViewScope: CoroutineScope,
+    val socket: WrpSocket,
+    val webView: WebView,
+    val url: String
+) {}
 
 private abstract class WrpJsInterface {
     @JavascriptInterface

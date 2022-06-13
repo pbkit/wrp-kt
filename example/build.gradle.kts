@@ -34,6 +34,7 @@ android {
 
 dependencies {
     implementation(project(":core"))
+    implementation("pro.streem.pbandk:pbandk-runtime:0.13.0")
     implementation("androidx.core:core-ktx:1.7.0")
     implementation("androidx.compose.ui:ui:1.2.0-beta03")
     implementation("androidx.compose.material:material:1.2.0-beta03")

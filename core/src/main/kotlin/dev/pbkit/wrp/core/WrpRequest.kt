@@ -4,6 +4,7 @@ import dev.pbkit.wrp.WrpHostMessageResFinish
 import dev.pbkit.wrp.WrpHostMessageResPayload
 import dev.pbkit.wrp.WrpHostMessageResStart
 import dev.pbkit.wrp.WrpMessage
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.SharedFlow
 import pbandk.ByteArr
 
@@ -11,6 +12,7 @@ private typealias Metadata = Map<String, String>
 
 class WrpRequest(
     private val channel: WrpChannel,
+    val scope: CoroutineScope,
     val methodName: String,
     val metadata: Metadata,
     val reqId: String,

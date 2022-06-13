@@ -58,6 +58,7 @@ class WrpHost(private val channel: WrpChannel, private val availableMethods: Set
                         val req = MutableSharedFlow<ByteArray>()
                         val request: WrpRequest = WrpRequest(
                             channel,
+                            scope,
                             methodName,
                             metadata,
                             reqId,
