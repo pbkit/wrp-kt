@@ -38,6 +38,7 @@ fun serveWrpExampleService(impl: WrpExampleService): WrpServer {
                             }
                         }
                     }
+                    request.sendTrailer(mapOf())
                 } catch (error: Exception) {
                     val trailer = mutableMapOf<String, String>()
                     trailer["wrp-status"] = "error"

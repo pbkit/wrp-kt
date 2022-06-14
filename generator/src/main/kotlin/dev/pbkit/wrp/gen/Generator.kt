@@ -61,6 +61,7 @@ class Generator : ServiceGenerator {
                                         when (request.methodName) {
                                             ${serveFunMethodHandlers.joinToString("\n                                            ")}
                                         }
+                                        request.sendTrailer(mapOf())
                                     } catch (error: Exception) {
                                         val trailer = mutableMapOf<String, String>()
                                         trailer["wrp-status"] = "error"
