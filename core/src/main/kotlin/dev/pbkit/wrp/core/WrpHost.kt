@@ -4,6 +4,7 @@ import dev.pbkit.wrp.WrpHostMessageError
 import dev.pbkit.wrp.WrpHostMessageInitialize
 import dev.pbkit.wrp.WrpMessage
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.mapNotNull
@@ -13,7 +14,7 @@ import kotlinx.coroutines.flow.onStart
 private class RequestHandlingState(
     val reqId: String,
     val request: WrpRequest,
-    val req: MutableSharedFlow<ByteArray>,
+    val req: Channel<ByteArray>,
     var reqFinished: Boolean,
     var resFinished: Boolean
 )
@@ -55,7 +56,7 @@ class WrpHost(private val channel: WrpChannel, private val availableMethods: Set
                     }
                     is WrpMessage.Message.GuestReqStart -> {
                         val (reqId, methodName, metadata) = msg.value
-                        val req = MutableSharedFlow<ByteArray>()
+                        val req = Channel<ByteArray>(Channel.BUFFERED)
                         val request: WrpRequest = WrpRequest(
                             channel,
                             scope,
@@ -72,16 +73,14 @@ class WrpHost(private val channel: WrpChannel, private val availableMethods: Set
                             resFinished = false
                         )
                         states[reqId] = state
-                        req.onCompletion {
-                            state.reqFinished = true
-                            tryForgetState(state)
-                        }
                         request
                     }
                     is WrpMessage.Message.GuestReqPayload -> {
                         val (reqId, payload) = msg.value
                         processMessage(channel, states, reqId) { state ->
-                            state.req.emit(payload.array)
+                            if (!state.req.isClosedForSend) {
+                                state.req.send(payload.array)
+                            }
                         }
                         null
                     }
@@ -104,7 +103,13 @@ class WrpHost(private val channel: WrpChannel, private val availableMethods: Set
                     else -> null
                 }
             }
-            .onCompletion { }
+            .onCompletion {
+                for ((_, state) in states) {
+                    state.reqFinished = true
+                    state.resFinished = true
+                    tryForgetState(state)
+                }
+            }
     }
 }
 

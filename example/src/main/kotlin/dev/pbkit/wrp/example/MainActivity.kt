@@ -4,6 +4,8 @@ import android.graphics.Bitmap
 import android.os.Bundle
 import android.util.Log
 import android.webkit.JavascriptInterface
+import android.webkit.JsResult
+import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.activity.ComponentActivity
@@ -19,16 +21,27 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.viewinterop.AndroidView
-import dev.pbkit.wrp.*
+import dev.pbkit.wrp.GetSliderValueRequest
+import dev.pbkit.wrp.GetSliderValueResponse
+import dev.pbkit.wrp.GetTextValueRequest
+import dev.pbkit.wrp.GetTextValueResponse
+import dev.pbkit.wrp.WrpExampleService
 import dev.pbkit.wrp.core.WrpChannel
 import dev.pbkit.wrp.core.WrpSocket
 import dev.pbkit.wrp.core.startWrpServer
+import dev.pbkit.wrp.serveWrpExampleService
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
@@ -42,14 +55,21 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun Test() {
+    val scope = rememberCoroutineScope()
     val sliderValue = remember { mutableStateOf(50f) }
+    val sliderValueFlow = remember { MutableSharedFlow<Float>() }
     val inputText = remember { mutableStateOf(TextFieldValue("Hello, World!")) }
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Text(text = "WrpExampleServer (Host)")
         Slider(
             value = sliderValue.value,
             valueRange = 0f..100f,
-            onValueChange = { sliderValue.value = it.toFloat() }
+            onValueChange = {
+                scope.launch {
+                    sliderValue.value = it
+                    sliderValueFlow.emit(it)
+                }
+            }
         )
         TextField(
             value = inputText.value,
@@ -59,29 +79,33 @@ fun Test() {
             update = { webView ->
                 WebView.setWebContentsDebuggingEnabled(true)
                 webView.loadUrl("https://pbkit.dev/wrp-example-guest")
-            },
-            onSocketIsReady = { event ->
-                val url = event.url
-                Log.d("Wrp", "Socket is ready: $url")
-                startWrpServer(
-                    scope = event.webViewScope,
-                    channel = WrpChannel(event.socket),
-                    servers = arrayOf(
-                        serveWrpExampleService(object : WrpExampleService {
-                            override suspend fun GetSliderValue(req: GetSliderValueRequest): GetSliderValueResponse {
-                                Log.d("Wrp", "GetSliderValue called!")
-                                return GetSliderValueResponse(sliderValue.value.toInt())
-                            }
-
-                            override suspend fun GetTextValue(req: GetTextValueRequest): GetTextValueResponse {
-                                Log.d("Wrp", "GetTextValue called!")
-                                return GetTextValueResponse(inputText.value.text)
-                            }
-                        })
-                    )
-                )
             }
-        )
+        ) { event ->
+            val url = event.url
+            Log.d("Wrp", "Socket is ready: $url")
+            startWrpServer(
+                scope = event.webViewScope,
+                channel = WrpChannel(event.socket),
+                servers = arrayOf(
+                    serveWrpExampleService(object : WrpExampleService {
+                        override suspend fun GetSliderValue(req: GetSliderValueRequest): ReceiveChannel<GetSliderValueResponse> {
+                            val channel = Channel<GetSliderValueResponse>(Channel.BUFFERED)
+                            channel.send(GetSliderValueResponse(sliderValue.value.toInt()))
+                            event.webViewScope.launch {
+                                sliderValueFlow.asSharedFlow().collect { value ->
+                                    channel.send(GetSliderValueResponse(value.toInt()))
+                                }
+                            }
+                            return channel
+                        }
+
+                        override suspend fun GetTextValue(req: GetTextValueRequest): GetTextValueResponse {
+                            return GetTextValueResponse(inputText.value.text)
+                        }
+                    })
+                )
+            )
+        }
     }
 }
 
@@ -115,6 +139,16 @@ fun WrpWebView(
                     cont.resume(false)
                 }
             }
+            webChromeClient = object : WebChromeClient() {
+                override fun onJsAlert(
+                    view: WebView?,
+                    url: String?,
+                    message: String?,
+                    result: JsResult?
+                ): Boolean {
+                    return super.onJsAlert(view, url, message, result)
+                }
+            }
             webViewClient = object : WebViewClient() {
                 override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
                     super.onPageStarted(view, url, favicon)
@@ -128,12 +162,14 @@ fun WrpWebView(
                     if (view == null || url == null) return
                     val currentSession = sessionCounter
                     scope.launch {
+                        val scope = this
                         val handshakeResult = handshake()
-                        if (!handshakeResult) this.cancel()
+                        if (!handshakeResult) scope.cancel()
                         onSocketIsReady(SocketIsReadyEvent(this, object : WrpSocket {
                             override suspend fun read(): ByteArray? = suspendCoroutine { cont ->
                                 if (currentSession != sessionCounter) {
                                     cont.resume(null)
+                                    scope.cancel()
                                 } else if (jsInterface.queue.size > 0) {
                                     val payload = jsInterface.queue.removeFirst()
                                     cont.resume(payload)

@@ -5,7 +5,7 @@ import dev.pbkit.wrp.WrpHostMessageResPayload
 import dev.pbkit.wrp.WrpHostMessageResStart
 import dev.pbkit.wrp.WrpMessage
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.channels.Channel
 import pbandk.ByteArr
 
 private typealias Metadata = Map<String, String>
@@ -16,7 +16,7 @@ class WrpRequest(
     val methodName: String,
     val metadata: Metadata,
     val reqId: String,
-    val req: SharedFlow<ByteArray>
+    val req: Channel<ByteArray>
 ) {
     suspend fun sendHeader(value: Metadata) {
         channel.send(

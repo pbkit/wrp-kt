@@ -2,14 +2,14 @@ package dev.pbkit.wrp
 
 import dev.pbkit.wrp.core.WrpRequest
 import dev.pbkit.wrp.core.WrpServer
-import kotlinx.coroutines.flow.take
+import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.launch
 import pbandk.decodeFromByteArray
 import pbandk.encodeToByteArray
 
 interface WrpExampleService {
     suspend fun GetTextValue(req: dev.pbkit.wrp.GetTextValueRequest): dev.pbkit.wrp.GetTextValueResponse
-    suspend fun GetSliderValue(req: dev.pbkit.wrp.GetSliderValueRequest): dev.pbkit.wrp.GetSliderValueResponse
+    suspend fun GetSliderValue(req: dev.pbkit.wrp.GetSliderValueRequest): ReceiveChannel<dev.pbkit.wrp.GetSliderValueResponse>
 }
 
 fun serveWrpExampleService(impl: WrpExampleService): WrpServer {
@@ -24,17 +24,25 @@ fun serveWrpExampleService(impl: WrpExampleService): WrpServer {
                 try {
                     when (request.methodName) {
                         "pbkit.wrp.example.WrpExampleService/GetTextValue" -> {
-                            request.req.take(1).collect { byteArray ->
-                                val req = dev.pbkit.wrp.GetTextValueRequest.decodeFromByteArray(byteArray)
+                            for (byteArray in request.req) {
+                                val req =
+                                    dev.pbkit.wrp.GetTextValueRequest.decodeFromByteArray(byteArray)
                                 val res = impl.GetTextValue(req).encodeToByteArray()
                                 request.sendPayload(res)
+                                request.req.close()
+                                break
                             }
                         }
                         "pbkit.wrp.example.WrpExampleService/GetSliderValue" -> {
-                            request.req.take(1).collect { byteArray ->
-                                val req = dev.pbkit.wrp.GetSliderValueRequest.decodeFromByteArray(byteArray)
-                                val res = impl.GetSliderValue(req).encodeToByteArray()
-                                request.sendPayload(res)
+                            for (byteArray in request.req) {
+                                val req = dev.pbkit.wrp.GetSliderValueRequest.decodeFromByteArray(
+                                    byteArray
+                                )
+                                for (res in impl.GetSliderValue(req)) {
+                                    request.sendPayload(res.encodeToByteArray())
+                                }
+                                request.req.close()
+                                break
                             }
                         }
                     }
