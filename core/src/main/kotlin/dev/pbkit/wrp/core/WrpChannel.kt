@@ -43,8 +43,7 @@ class WrpChannel(private val socket: WrpSocket) {
                         queue.addFirst(curr.copyOfRange(remaining, curr.size))
                     }
                     if (curr.size >= remaining) {
-                        val byteArray = ByteArray(payloadSize)
-                        payloadBuffer.get(byteArray)
+                        val byteArray = payloadBuffer.array()
                         payloadBuffer.clear()
                         isSizePhase = true
                         messages.emit(WrpMessage.decodeFromByteArray(byteArray))

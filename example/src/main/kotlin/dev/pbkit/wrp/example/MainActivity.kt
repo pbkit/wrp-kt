@@ -19,15 +19,10 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.viewinterop.AndroidView
-import dev.pbkit.wrp.GetSliderValueRequest
-import dev.pbkit.wrp.GetSliderValueResponse
-import dev.pbkit.wrp.GetTextValueRequest
-import dev.pbkit.wrp.GetTextValueResponse
-import dev.pbkit.wrp.WrpExampleService
+import dev.pbkit.wrp.*
 import dev.pbkit.wrp.core.WrpChannel
 import dev.pbkit.wrp.core.WrpSocket
 import dev.pbkit.wrp.core.startWrpServer
-import dev.pbkit.wrp.serveWrpExampleService
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
@@ -62,6 +57,7 @@ fun Test() {
         )
         WrpWebView(
             update = { webView ->
+                WebView.setWebContentsDebuggingEnabled(true)
                 webView.loadUrl("https://pbkit.dev/wrp-example-guest")
             },
             onSocketIsReady = { event ->
@@ -76,6 +72,7 @@ fun Test() {
                                 Log.d("Wrp", "GetSliderValue called!")
                                 return GetSliderValueResponse(sliderValue.value.toInt())
                             }
+
                             override suspend fun GetTextValue(req: GetTextValueRequest): GetTextValueResponse {
                                 Log.d("Wrp", "GetTextValue called!")
                                 return GetTextValueResponse(inputText.value.text)
@@ -96,23 +93,10 @@ fun WrpWebView(
     val scope = rememberCoroutineScope()
     AndroidView(factory = {
         WebView(it).apply {
-            val queue = ArrayDeque<ByteArray>()
-            var outerCont: Continuation<ByteArray?>? = null
-            var sessionCounter = 0
             settings.javaScriptEnabled = true
-            addJavascriptInterface(
-                object : WrpJsInterface() {
-                    override fun recv(data: String) {
-                        val payload = data.toByteArray(Charsets.ISO_8859_1)
-                        if (outerCont == null) {
-                            queue.addLast(payload)
-                        } else {
-                            outerCont!!.resume(payload)
-                            outerCont = null
-                        }
-                    }
-                }, "<android-glue>"
-            )
+            var sessionCounter = 0
+            val jsInterface = WrpJsInterface()
+            addJavascriptInterface(jsInterface, "<android-glue>")
             suspend fun evalJs(script: String) = suspendCoroutine<String> { cont ->
                 this.evaluateJavascript(script) { result ->
                     cont.resume(result)
@@ -134,8 +118,8 @@ fun WrpWebView(
             webViewClient = object : WebViewClient() {
                 override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
                     super.onPageStarted(view, url, favicon)
-                    queue.clear()
-                    outerCont?.resume(null)
+                    jsInterface.queue.clear()
+                    jsInterface.outerCont?.resume(null)
                     ++sessionCounter
                 }
 
@@ -150,11 +134,11 @@ fun WrpWebView(
                             override suspend fun read(): ByteArray? = suspendCoroutine { cont ->
                                 if (currentSession != sessionCounter) {
                                     cont.resume(null)
-                                } else if (queue.size > 0) {
-                                    val payload = queue.removeFirst()
+                                } else if (jsInterface.queue.size > 0) {
+                                    val payload = jsInterface.queue.removeFirst()
                                     cont.resume(payload)
                                 } else {
-                                    outerCont = cont
+                                    jsInterface.outerCont = cont
                                 }
                             }
 
@@ -178,9 +162,20 @@ class SocketIsReadyEvent(
     val url: String
 ) {}
 
-private abstract class WrpJsInterface {
+private class WrpJsInterface {
+    val queue = ArrayDeque<ByteArray>()
+    var outerCont: Continuation<ByteArray?>? = null
+
     @JavascriptInterface
-    abstract fun recv(data: String)
+    fun recv(data: String) {
+        val payload = data.toByteArray(Charsets.ISO_8859_1)
+        if (outerCont == null) {
+            queue.addLast(payload)
+        } else {
+            outerCont!!.resume(payload)
+            outerCont = null
+        }
+    }
 }
 
 private fun ba2str(ba: ByteArray): String {
