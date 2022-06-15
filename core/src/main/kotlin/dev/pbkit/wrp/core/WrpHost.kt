@@ -103,13 +103,6 @@ class WrpHost(private val channel: WrpChannel, private val availableMethods: Set
                     else -> null
                 }
             }
-            .onCompletion {
-                for ((_, state) in states) {
-                    state.reqFinished = true
-                    state.resFinished = true
-                    tryForgetState(state)
-                }
-            }
     }
 }
 

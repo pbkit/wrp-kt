@@ -3,7 +3,7 @@ package dev.pbkit.wrp.core
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-fun startWrpServer(scope: CoroutineScope, channel: WrpChannel, servers: Array<WrpServer>) {
+fun startWrpServer(scope: CoroutineScope, channel: WrpChannel, vararg servers: WrpServer) {
     val availableMethods = servers
         .map { server -> server.availableMethods }
         .reduce { acc, set -> acc.union(set) }

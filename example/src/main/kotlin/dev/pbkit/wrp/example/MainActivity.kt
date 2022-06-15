@@ -33,6 +33,7 @@ import dev.pbkit.wrp.serveWrpExampleService
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
@@ -83,24 +84,22 @@ fun Test() {
             startWrpServer(
                 scope = event.webViewScope,
                 channel = WrpChannel(event.socket),
-                servers = arrayOf(
-                    serveWrpExampleService(object : WrpExampleService {
-                        override suspend fun GetSliderValue(req: GetSliderValueRequest): ReceiveChannel<GetSliderValueResponse> {
-                            val channel = Channel<GetSliderValueResponse>(Channel.BUFFERED)
-                            channel.send(GetSliderValueResponse(sliderValue.value.toInt()))
-                            event.webViewScope.launch {
-                                sliderValueFlow.asSharedFlow().collect { value ->
-                                    channel.send(GetSliderValueResponse(value.toInt()))
-                                }
+                serveWrpExampleService(object : WrpExampleService {
+                    override suspend fun GetSliderValue(req: GetSliderValueRequest): ReceiveChannel<GetSliderValueResponse> {
+                        val channel = Channel<GetSliderValueResponse>(Channel.BUFFERED)
+                        channel.send(GetSliderValueResponse(sliderValue.value.toInt()))
+                        event.webViewScope.launch {
+                            sliderValueFlow.asSharedFlow().collect { value ->
+                                channel.send(GetSliderValueResponse(value.toInt()))
                             }
-                            return channel
                         }
+                        return channel
+                    }
 
-                        override suspend fun GetTextValue(req: GetTextValueRequest): GetTextValueResponse {
-                            return GetTextValueResponse(inputText.value.text)
-                        }
-                    })
-                )
+                    override suspend fun GetTextValue(req: GetTextValueRequest): GetTextValueResponse {
+                        return GetTextValueResponse(inputText.value.text)
+                    }
+                }),
             )
         }
     }
@@ -117,6 +116,7 @@ fun WrpWebView(
             settings.javaScriptEnabled = true
             var sessionCounter = 0
             val jsInterface = WrpJsInterface(scope)
+            var socketJob: Job? = null
             addJavascriptInterface(jsInterface, "<android-glue>")
             suspend fun evalJs(script: String) = suspendCoroutine<String> { cont ->
                 this.evaluateJavascript(script) { result ->
@@ -152,16 +152,16 @@ fun WrpWebView(
                     jsInterface.channel.close()
                     jsInterface.channel = Channel<ByteArray>(Channel.BUFFERED)
                     ++sessionCounter
+                    socketJob?.cancel()
                 }
 
                 override fun onPageFinished(view: WebView?, url: String?) {
                     super.onPageFinished(view, url)
                     if (view == null || url == null) return
                     val currentSession = sessionCounter
-                    scope.launch {
-                        val scope = this
+                    socketJob = scope.launch {
                         val handshakeResult = handshake()
-                        if (!handshakeResult) scope.cancel()
+                        if (!handshakeResult) cancel()
                         val currentChannel = jsInterface.channel
                         onSocketIsReady(SocketIsReadyEvent(this, object : WrpSocket {
                             override suspend fun read(): ByteArray? {
