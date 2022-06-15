@@ -3,6 +3,7 @@ package dev.pbkit.wrp
 import dev.pbkit.wrp.core.WrpRequest
 import dev.pbkit.wrp.core.WrpServer
 import kotlinx.coroutines.channels.ReceiveChannel
+import kotlinx.coroutines.channels.produce
 import kotlinx.coroutines.launch
 import pbandk.decodeFromByteArray
 import pbandk.encodeToByteArray
@@ -25,8 +26,7 @@ fun serveWrpExampleService(impl: WrpExampleService): WrpServer {
                     when (request.methodName) {
                         "pbkit.wrp.example.WrpExampleService/GetTextValue" -> {
                             for (byteArray in request.req) {
-                                val req =
-                                    dev.pbkit.wrp.GetTextValueRequest.decodeFromByteArray(byteArray)
+                                val req = dev.pbkit.wrp.GetTextValueRequest.decodeFromByteArray(byteArray)
                                 val res = impl.GetTextValue(req).encodeToByteArray()
                                 request.sendPayload(res)
                                 request.req.close()
@@ -35,9 +35,7 @@ fun serveWrpExampleService(impl: WrpExampleService): WrpServer {
                         }
                         "pbkit.wrp.example.WrpExampleService/GetSliderValue" -> {
                             for (byteArray in request.req) {
-                                val req = dev.pbkit.wrp.GetSliderValueRequest.decodeFromByteArray(
-                                    byteArray
-                                )
+                                val req = dev.pbkit.wrp.GetSliderValueRequest.decodeFromByteArray(byteArray)
                                 for (res in impl.GetSliderValue(req)) {
                                     request.sendPayload(res.encodeToByteArray())
                                 }
