@@ -30,7 +30,6 @@ import dev.pbkit.wrp.core.WrpChannel
 import dev.pbkit.wrp.core.WrpSocket
 import dev.pbkit.wrp.core.startWrpServer
 import dev.pbkit.wrp.serveWrpExampleService
-import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 import kotlinx.coroutines.CoroutineScope
@@ -39,9 +38,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
@@ -119,7 +116,7 @@ fun WrpWebView(
         WebView(it).apply {
             settings.javaScriptEnabled = true
             var sessionCounter = 0
-            val jsInterface = WrpJsInterface()
+            val jsInterface = WrpJsInterface(scope)
             addJavascriptInterface(jsInterface, "<android-glue>")
             suspend fun evalJs(script: String) = suspendCoroutine<String> { cont ->
                 this.evaluateJavascript(script) { result ->
@@ -152,8 +149,8 @@ fun WrpWebView(
             webViewClient = object : WebViewClient() {
                 override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
                     super.onPageStarted(view, url, favicon)
-                    jsInterface.queue.clear()
-                    jsInterface.outerCont?.resume(null)
+                    jsInterface.channel.close()
+                    jsInterface.channel = Channel<ByteArray>(Channel.BUFFERED)
                     ++sessionCounter
                 }
 
@@ -165,16 +162,14 @@ fun WrpWebView(
                         val scope = this
                         val handshakeResult = handshake()
                         if (!handshakeResult) scope.cancel()
+                        val currentChannel = jsInterface.channel
                         onSocketIsReady(SocketIsReadyEvent(this, object : WrpSocket {
-                            override suspend fun read(): ByteArray? = suspendCoroutine { cont ->
-                                if (currentSession != sessionCounter) {
-                                    cont.resume(null)
-                                    scope.cancel()
-                                } else if (jsInterface.queue.size > 0) {
-                                    val payload = jsInterface.queue.removeFirst()
-                                    cont.resume(payload)
-                                } else {
-                                    jsInterface.outerCont = cont
+                            override suspend fun read(): ByteArray? {
+                                if (currentSession != sessionCounter) return null
+                                return try {
+                                    currentChannel.receive()
+                                } catch (e: Exception) {
+                                    null
                                 }
                             }
 
@@ -198,19 +193,13 @@ class SocketIsReadyEvent(
     val url: String
 ) {}
 
-private class WrpJsInterface {
-    val queue = ArrayDeque<ByteArray>()
-    var outerCont: Continuation<ByteArray?>? = null
+private class WrpJsInterface(val scope: CoroutineScope) {
+    var channel = Channel<ByteArray>()
 
     @JavascriptInterface
     fun recv(data: String) {
         val payload = data.toByteArray(Charsets.ISO_8859_1)
-        if (outerCont == null) {
-            queue.addLast(payload)
-        } else {
-            outerCont!!.resume(payload)
-            outerCont = null
-        }
+        scope.launch { channel.send(payload) }
     }
 }
 
