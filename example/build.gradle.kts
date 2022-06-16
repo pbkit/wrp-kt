@@ -6,7 +6,7 @@ plugins {
 android {
     compileSdk = 32
     defaultConfig {
-        applicationId = "dev.pbkit.wrp.example"
+        applicationId = "dev.pbkit.wrp.android.example"
         minSdk = 23
         targetSdk = 32
         versionCode = 1
@@ -21,7 +21,7 @@ android {
         }
     }
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "11"
     }
     buildFeatures {
         compose = true
@@ -34,6 +34,7 @@ android {
 
 dependencies {
     implementation(project(":core"))
+    implementation(project(":webview-compose"))
     implementation("pro.streem.pbandk:pbandk-runtime:0.13.0")
     implementation("androidx.core:core-ktx:1.7.0")
     implementation("androidx.compose.ui:ui:1.2.0-beta03")

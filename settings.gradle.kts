@@ -2,6 +2,8 @@ rootProject.name = "wrp-kt"
 include(":core")
 include(":example")
 include(":generator")
+include(":webview")
+include(":webview-compose")
 
 pluginManagement {
     repositories {
