@@ -9,13 +9,22 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.material.Slider
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.text.input.TextFieldValue
-import dev.pbkit.wrp.*
+import dev.pbkit.wrp.GetSliderValueRequest
+import dev.pbkit.wrp.GetSliderValueResponse
+import dev.pbkit.wrp.GetTextValueRequest
+import dev.pbkit.wrp.GetTextValueResponse
+import dev.pbkit.wrp.WrpExampleService
 import dev.pbkit.wrp.android.compose.WrpWebView
 import dev.pbkit.wrp.core.WrpChannel
 import dev.pbkit.wrp.core.startWrpServer
+import dev.pbkit.wrp.serveWrpExampleService
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -61,7 +70,7 @@ fun Test() {
                 WrpChannel(socket),
                 serveWrpExampleService(object : WrpExampleService {
                     override suspend fun GetSliderValue(req: GetSliderValueRequest): ReceiveChannel<GetSliderValueResponse> {
-                        val channel = Channel<GetSliderValueResponse>(Channel.BUFFERED)
+                        val channel = Channel<GetSliderValueResponse>()
                         slider
                             .onEach { channel.send(GetSliderValueResponse(it.toInt())) }
                             .launchIn(scope)
