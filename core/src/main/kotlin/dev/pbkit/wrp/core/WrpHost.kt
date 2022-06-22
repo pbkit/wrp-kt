@@ -24,9 +24,9 @@ class WrpHost(private val channel: WrpChannel, private val availableMethods: Set
     fun listen(scope: CoroutineScope): Flow<WrpRequest> {
         val states: RequestHandlingStateTable = mutableMapOf()
         fun tryForgetState(state: RequestHandlingState) {
-            if (!state.reqFinished) return;
-            if (!state.resFinished) return;
-            states.remove(state.reqId);
+            if (!state.reqFinished) return
+            if (!state.resFinished) return
+            states.remove(state.reqId)
         }
         return channel.listen(scope)
             .onStart {

@@ -3,60 +3,81 @@
 package dev.pbkit.wrp
 
 @pbandk.Export
-public data class WrpMessage(
+data class WrpMessage(
     val message: Message<*>? = null,
     override val unknownFields: Map<Int, pbandk.UnknownField> = emptyMap()
 ) : pbandk.Message {
-    public sealed class Message<V>(value: V) : pbandk.Message.OneOf<V>(value) {
-        public class HostInitialize(hostInitialize: dev.pbkit.wrp.WrpHostMessageInitialize) : Message<dev.pbkit.wrp.WrpHostMessageInitialize>(hostInitialize)
-        public class HostError(hostError: dev.pbkit.wrp.WrpHostMessageError) : Message<dev.pbkit.wrp.WrpHostMessageError>(hostError)
-        public class HostResStart(hostResStart: dev.pbkit.wrp.WrpHostMessageResStart) : Message<dev.pbkit.wrp.WrpHostMessageResStart>(hostResStart)
-        public class HostResPayload(hostResPayload: dev.pbkit.wrp.WrpHostMessageResPayload) : Message<dev.pbkit.wrp.WrpHostMessageResPayload>(hostResPayload)
-        public class HostResFinish(hostResFinish: dev.pbkit.wrp.WrpHostMessageResFinish) : Message<dev.pbkit.wrp.WrpHostMessageResFinish>(hostResFinish)
-        public class GuestReqStart(guestReqStart: dev.pbkit.wrp.WrpGuestMessageReqStart) : Message<dev.pbkit.wrp.WrpGuestMessageReqStart>(guestReqStart)
-        public class GuestReqPayload(guestReqPayload: dev.pbkit.wrp.WrpGuestMessageReqPayload) : Message<dev.pbkit.wrp.WrpGuestMessageReqPayload>(guestReqPayload)
-        public class GuestReqFinish(guestReqFinish: dev.pbkit.wrp.WrpGuestMessageReqFinish) : Message<dev.pbkit.wrp.WrpGuestMessageReqFinish>(guestReqFinish)
-        public class GuestResFinish(guestResFinish: dev.pbkit.wrp.WrpGuestMessageResFinish) : Message<dev.pbkit.wrp.WrpGuestMessageResFinish>(guestResFinish)
+    sealed class Message<V>(value: V) : pbandk.Message.OneOf<V>(value) {
+        class HostInitialize(hostInitialize: WrpHostMessageInitialize) :
+            Message<WrpHostMessageInitialize>(hostInitialize)
+
+        class HostError(hostError: WrpHostMessageError) :
+            Message<WrpHostMessageError>(hostError)
+
+        class HostResStart(hostResStart: WrpHostMessageResStart) :
+            Message<WrpHostMessageResStart>(hostResStart)
+
+        class HostResPayload(hostResPayload: WrpHostMessageResPayload) :
+            Message<WrpHostMessageResPayload>(hostResPayload)
+
+        class HostResFinish(hostResFinish: WrpHostMessageResFinish) :
+            Message<WrpHostMessageResFinish>(hostResFinish)
+
+        class GuestReqStart(guestReqStart: WrpGuestMessageReqStart) :
+            Message<WrpGuestMessageReqStart>(guestReqStart)
+
+        class GuestReqPayload(guestReqPayload: WrpGuestMessageReqPayload) :
+            Message<WrpGuestMessageReqPayload>(guestReqPayload)
+
+        class GuestReqFinish(guestReqFinish: WrpGuestMessageReqFinish) :
+            Message<WrpGuestMessageReqFinish>(guestReqFinish)
+
+        class GuestResFinish(guestResFinish: WrpGuestMessageResFinish) :
+            Message<WrpGuestMessageResFinish>(guestResFinish)
     }
 
-    val hostInitialize: dev.pbkit.wrp.WrpHostMessageInitialize?
+    val hostInitialize: WrpHostMessageInitialize?
         get() = (message as? Message.HostInitialize)?.value
-    val hostError: dev.pbkit.wrp.WrpHostMessageError?
+    val hostError: WrpHostMessageError?
         get() = (message as? Message.HostError)?.value
-    val hostResStart: dev.pbkit.wrp.WrpHostMessageResStart?
+    val hostResStart: WrpHostMessageResStart?
         get() = (message as? Message.HostResStart)?.value
-    val hostResPayload: dev.pbkit.wrp.WrpHostMessageResPayload?
+    val hostResPayload: WrpHostMessageResPayload?
         get() = (message as? Message.HostResPayload)?.value
-    val hostResFinish: dev.pbkit.wrp.WrpHostMessageResFinish?
+    val hostResFinish: WrpHostMessageResFinish?
         get() = (message as? Message.HostResFinish)?.value
-    val guestReqStart: dev.pbkit.wrp.WrpGuestMessageReqStart?
+    val guestReqStart: WrpGuestMessageReqStart?
         get() = (message as? Message.GuestReqStart)?.value
-    val guestReqPayload: dev.pbkit.wrp.WrpGuestMessageReqPayload?
+    val guestReqPayload: WrpGuestMessageReqPayload?
         get() = (message as? Message.GuestReqPayload)?.value
-    val guestReqFinish: dev.pbkit.wrp.WrpGuestMessageReqFinish?
+    val guestReqFinish: WrpGuestMessageReqFinish?
         get() = (message as? Message.GuestReqFinish)?.value
-    val guestResFinish: dev.pbkit.wrp.WrpGuestMessageResFinish?
+    val guestResFinish: WrpGuestMessageResFinish?
         get() = (message as? Message.GuestResFinish)?.value
 
-    override operator fun plus(other: pbandk.Message?): dev.pbkit.wrp.WrpMessage = protoMergeImpl(other)
-    override val descriptor: pbandk.MessageDescriptor<dev.pbkit.wrp.WrpMessage> get() = Companion.descriptor
-    override val protoSize: Int by lazy { super.protoSize }
-    public companion object : pbandk.Message.Companion<dev.pbkit.wrp.WrpMessage> {
-        public val defaultInstance: dev.pbkit.wrp.WrpMessage by lazy { dev.pbkit.wrp.WrpMessage() }
-        override fun decodeWith(u: pbandk.MessageDecoder): dev.pbkit.wrp.WrpMessage = dev.pbkit.wrp.WrpMessage.decodeWithImpl(u)
+    override operator fun plus(other: pbandk.Message?): WrpMessage =
+        protoMergeImpl(other)
 
-        override val descriptor: pbandk.MessageDescriptor<dev.pbkit.wrp.WrpMessage> by lazy {
-            val fieldsList = ArrayList<pbandk.FieldDescriptor<dev.pbkit.wrp.WrpMessage, *>>(9)
+    override val descriptor: pbandk.MessageDescriptor<WrpMessage> get() = Companion.descriptor
+    override val protoSize: Int by lazy { super.protoSize }
+
+    companion object : pbandk.Message.Companion<WrpMessage> {
+        val defaultInstance: WrpMessage by lazy { WrpMessage() }
+        override fun decodeWith(u: pbandk.MessageDecoder): WrpMessage =
+            WrpMessage.decodeWithImpl(u)
+
+        override val descriptor: pbandk.MessageDescriptor<WrpMessage> by lazy {
+            val fieldsList = ArrayList<pbandk.FieldDescriptor<WrpMessage, *>>(9)
             fieldsList.apply {
                 add(
                     pbandk.FieldDescriptor(
                         messageDescriptor = this@Companion::descriptor,
                         name = "Host_Initialize",
                         number = 1,
-                        type = pbandk.FieldDescriptor.Type.Message(messageCompanion = dev.pbkit.wrp.WrpHostMessageInitialize.Companion),
+                        type = pbandk.FieldDescriptor.Type.Message(messageCompanion = WrpHostMessageInitialize.Companion),
                         oneofMember = true,
                         jsonName = "HostInitialize",
-                        value = dev.pbkit.wrp.WrpMessage::hostInitialize
+                        value = WrpMessage::hostInitialize
                     )
                 )
                 add(
@@ -64,10 +85,10 @@ public data class WrpMessage(
                         messageDescriptor = this@Companion::descriptor,
                         name = "Host_Error",
                         number = 2,
-                        type = pbandk.FieldDescriptor.Type.Message(messageCompanion = dev.pbkit.wrp.WrpHostMessageError.Companion),
+                        type = pbandk.FieldDescriptor.Type.Message(messageCompanion = WrpHostMessageError.Companion),
                         oneofMember = true,
                         jsonName = "HostError",
-                        value = dev.pbkit.wrp.WrpMessage::hostError
+                        value = WrpMessage::hostError
                     )
                 )
                 add(
@@ -75,10 +96,10 @@ public data class WrpMessage(
                         messageDescriptor = this@Companion::descriptor,
                         name = "Host_ResStart",
                         number = 3,
-                        type = pbandk.FieldDescriptor.Type.Message(messageCompanion = dev.pbkit.wrp.WrpHostMessageResStart.Companion),
+                        type = pbandk.FieldDescriptor.Type.Message(messageCompanion = WrpHostMessageResStart.Companion),
                         oneofMember = true,
                         jsonName = "HostResStart",
-                        value = dev.pbkit.wrp.WrpMessage::hostResStart
+                        value = WrpMessage::hostResStart
                     )
                 )
                 add(
@@ -86,10 +107,10 @@ public data class WrpMessage(
                         messageDescriptor = this@Companion::descriptor,
                         name = "Host_ResPayload",
                         number = 4,
-                        type = pbandk.FieldDescriptor.Type.Message(messageCompanion = dev.pbkit.wrp.WrpHostMessageResPayload.Companion),
+                        type = pbandk.FieldDescriptor.Type.Message(messageCompanion = WrpHostMessageResPayload.Companion),
                         oneofMember = true,
                         jsonName = "HostResPayload",
-                        value = dev.pbkit.wrp.WrpMessage::hostResPayload
+                        value = WrpMessage::hostResPayload
                     )
                 )
                 add(
@@ -97,10 +118,10 @@ public data class WrpMessage(
                         messageDescriptor = this@Companion::descriptor,
                         name = "Host_ResFinish",
                         number = 5,
-                        type = pbandk.FieldDescriptor.Type.Message(messageCompanion = dev.pbkit.wrp.WrpHostMessageResFinish.Companion),
+                        type = pbandk.FieldDescriptor.Type.Message(messageCompanion = WrpHostMessageResFinish.Companion),
                         oneofMember = true,
                         jsonName = "HostResFinish",
-                        value = dev.pbkit.wrp.WrpMessage::hostResFinish
+                        value = WrpMessage::hostResFinish
                     )
                 )
                 add(
@@ -108,10 +129,10 @@ public data class WrpMessage(
                         messageDescriptor = this@Companion::descriptor,
                         name = "Guest_ReqStart",
                         number = 6,
-                        type = pbandk.FieldDescriptor.Type.Message(messageCompanion = dev.pbkit.wrp.WrpGuestMessageReqStart.Companion),
+                        type = pbandk.FieldDescriptor.Type.Message(messageCompanion = WrpGuestMessageReqStart.Companion),
                         oneofMember = true,
                         jsonName = "GuestReqStart",
-                        value = dev.pbkit.wrp.WrpMessage::guestReqStart
+                        value = WrpMessage::guestReqStart
                     )
                 )
                 add(
@@ -119,10 +140,10 @@ public data class WrpMessage(
                         messageDescriptor = this@Companion::descriptor,
                         name = "Guest_ReqPayload",
                         number = 7,
-                        type = pbandk.FieldDescriptor.Type.Message(messageCompanion = dev.pbkit.wrp.WrpGuestMessageReqPayload.Companion),
+                        type = pbandk.FieldDescriptor.Type.Message(messageCompanion = WrpGuestMessageReqPayload.Companion),
                         oneofMember = true,
                         jsonName = "GuestReqPayload",
-                        value = dev.pbkit.wrp.WrpMessage::guestReqPayload
+                        value = WrpMessage::guestReqPayload
                     )
                 )
                 add(
@@ -130,10 +151,10 @@ public data class WrpMessage(
                         messageDescriptor = this@Companion::descriptor,
                         name = "Guest_ReqFinish",
                         number = 8,
-                        type = pbandk.FieldDescriptor.Type.Message(messageCompanion = dev.pbkit.wrp.WrpGuestMessageReqFinish.Companion),
+                        type = pbandk.FieldDescriptor.Type.Message(messageCompanion = WrpGuestMessageReqFinish.Companion),
                         oneofMember = true,
                         jsonName = "GuestReqFinish",
-                        value = dev.pbkit.wrp.WrpMessage::guestReqFinish
+                        value = WrpMessage::guestReqFinish
                     )
                 )
                 add(
@@ -141,16 +162,16 @@ public data class WrpMessage(
                         messageDescriptor = this@Companion::descriptor,
                         name = "Guest_ResFinish",
                         number = 9,
-                        type = pbandk.FieldDescriptor.Type.Message(messageCompanion = dev.pbkit.wrp.WrpGuestMessageResFinish.Companion),
+                        type = pbandk.FieldDescriptor.Type.Message(messageCompanion = WrpGuestMessageResFinish.Companion),
                         oneofMember = true,
                         jsonName = "GuestResFinish",
-                        value = dev.pbkit.wrp.WrpMessage::guestResFinish
+                        value = WrpMessage::guestResFinish
                     )
                 )
             }
             pbandk.MessageDescriptor(
                 fullName = "pbkit.wrp.WrpMessage",
-                messageClass = dev.pbkit.wrp.WrpMessage::class,
+                messageClass = WrpMessage::class,
                 messageCompanion = this,
                 fields = fieldsList
             )
@@ -159,19 +180,23 @@ public data class WrpMessage(
 }
 
 @pbandk.Export
-public data class WrpHostMessageInitialize(
+data class WrpHostMessageInitialize(
     val availableMethods: List<String> = emptyList(),
     override val unknownFields: Map<Int, pbandk.UnknownField> = emptyMap()
 ) : pbandk.Message {
-    override operator fun plus(other: pbandk.Message?): dev.pbkit.wrp.WrpHostMessageInitialize = protoMergeImpl(other)
-    override val descriptor: pbandk.MessageDescriptor<dev.pbkit.wrp.WrpHostMessageInitialize> get() = Companion.descriptor
-    override val protoSize: Int by lazy { super.protoSize }
-    public companion object : pbandk.Message.Companion<dev.pbkit.wrp.WrpHostMessageInitialize> {
-        public val defaultInstance: dev.pbkit.wrp.WrpHostMessageInitialize by lazy { dev.pbkit.wrp.WrpHostMessageInitialize() }
-        override fun decodeWith(u: pbandk.MessageDecoder): dev.pbkit.wrp.WrpHostMessageInitialize = dev.pbkit.wrp.WrpHostMessageInitialize.decodeWithImpl(u)
+    override operator fun plus(other: pbandk.Message?): WrpHostMessageInitialize =
+        protoMergeImpl(other)
 
-        override val descriptor: pbandk.MessageDescriptor<dev.pbkit.wrp.WrpHostMessageInitialize> by lazy {
-            val fieldsList = ArrayList<pbandk.FieldDescriptor<dev.pbkit.wrp.WrpHostMessageInitialize, *>>(1)
+    override val descriptor: pbandk.MessageDescriptor<WrpHostMessageInitialize> get() = Companion.descriptor
+    override val protoSize: Int by lazy { super.protoSize }
+
+    companion object : pbandk.Message.Companion<WrpHostMessageInitialize> {
+        val defaultInstance: WrpHostMessageInitialize by lazy { WrpHostMessageInitialize() }
+        override fun decodeWith(u: pbandk.MessageDecoder): WrpHostMessageInitialize =
+            WrpHostMessageInitialize.decodeWithImpl(u)
+
+        override val descriptor: pbandk.MessageDescriptor<WrpHostMessageInitialize> by lazy {
+            val fieldsList = ArrayList<pbandk.FieldDescriptor<WrpHostMessageInitialize, *>>(1)
             fieldsList.apply {
                 add(
                     pbandk.FieldDescriptor(
@@ -180,13 +205,13 @@ public data class WrpHostMessageInitialize(
                         number = 1,
                         type = pbandk.FieldDescriptor.Type.Repeated<String>(valueType = pbandk.FieldDescriptor.Type.Primitive.String()),
                         jsonName = "availableMethods",
-                        value = dev.pbkit.wrp.WrpHostMessageInitialize::availableMethods
+                        value = WrpHostMessageInitialize::availableMethods
                     )
                 )
             }
             pbandk.MessageDescriptor(
                 fullName = "pbkit.wrp.WrpHostMessage_Initialize",
-                messageClass = dev.pbkit.wrp.WrpHostMessageInitialize::class,
+                messageClass = WrpHostMessageInitialize::class,
                 messageCompanion = this,
                 fields = fieldsList
             )
@@ -195,19 +220,21 @@ public data class WrpHostMessageInitialize(
 }
 
 @pbandk.Export
-public data class WrpHostMessageError(
+data class WrpHostMessageError(
     val message: String = "",
     override val unknownFields: Map<Int, pbandk.UnknownField> = emptyMap()
 ) : pbandk.Message {
-    override operator fun plus(other: pbandk.Message?): dev.pbkit.wrp.WrpHostMessageError = protoMergeImpl(other)
-    override val descriptor: pbandk.MessageDescriptor<dev.pbkit.wrp.WrpHostMessageError> get() = Companion.descriptor
+    override operator fun plus(other: pbandk.Message?): WrpHostMessageError = protoMergeImpl(other)
+    override val descriptor: pbandk.MessageDescriptor<WrpHostMessageError> get() = Companion.descriptor
     override val protoSize: Int by lazy { super.protoSize }
-    public companion object : pbandk.Message.Companion<dev.pbkit.wrp.WrpHostMessageError> {
-        public val defaultInstance: dev.pbkit.wrp.WrpHostMessageError by lazy { dev.pbkit.wrp.WrpHostMessageError() }
-        override fun decodeWith(u: pbandk.MessageDecoder): dev.pbkit.wrp.WrpHostMessageError = dev.pbkit.wrp.WrpHostMessageError.decodeWithImpl(u)
 
-        override val descriptor: pbandk.MessageDescriptor<dev.pbkit.wrp.WrpHostMessageError> by lazy {
-            val fieldsList = ArrayList<pbandk.FieldDescriptor<dev.pbkit.wrp.WrpHostMessageError, *>>(1)
+    companion object : pbandk.Message.Companion<WrpHostMessageError> {
+        val defaultInstance: WrpHostMessageError by lazy { WrpHostMessageError() }
+        override fun decodeWith(u: pbandk.MessageDecoder): WrpHostMessageError =
+            WrpHostMessageError.decodeWithImpl(u)
+
+        override val descriptor: pbandk.MessageDescriptor<WrpHostMessageError> by lazy {
+            val fieldsList = ArrayList<pbandk.FieldDescriptor<WrpHostMessageError, *>>(1)
             fieldsList.apply {
                 add(
                     pbandk.FieldDescriptor(
@@ -216,13 +243,13 @@ public data class WrpHostMessageError(
                         number = 1,
                         type = pbandk.FieldDescriptor.Type.Primitive.String(),
                         jsonName = "message",
-                        value = dev.pbkit.wrp.WrpHostMessageError::message
+                        value = WrpHostMessageError::message
                     )
                 )
             }
             pbandk.MessageDescriptor(
                 fullName = "pbkit.wrp.WrpHostMessage_Error",
-                messageClass = dev.pbkit.wrp.WrpHostMessageError::class,
+                messageClass = WrpHostMessageError::class,
                 messageCompanion = this,
                 fields = fieldsList
             )
@@ -231,20 +258,24 @@ public data class WrpHostMessageError(
 }
 
 @pbandk.Export
-public data class WrpHostMessageResStart(
+data class WrpHostMessageResStart(
     val reqId: String = "",
     val header: Map<String, String> = emptyMap(),
     override val unknownFields: Map<Int, pbandk.UnknownField> = emptyMap()
 ) : pbandk.Message {
-    override operator fun plus(other: pbandk.Message?): dev.pbkit.wrp.WrpHostMessageResStart = protoMergeImpl(other)
-    override val descriptor: pbandk.MessageDescriptor<dev.pbkit.wrp.WrpHostMessageResStart> get() = Companion.descriptor
-    override val protoSize: Int by lazy { super.protoSize }
-    public companion object : pbandk.Message.Companion<dev.pbkit.wrp.WrpHostMessageResStart> {
-        public val defaultInstance: dev.pbkit.wrp.WrpHostMessageResStart by lazy { dev.pbkit.wrp.WrpHostMessageResStart() }
-        override fun decodeWith(u: pbandk.MessageDecoder): dev.pbkit.wrp.WrpHostMessageResStart = dev.pbkit.wrp.WrpHostMessageResStart.decodeWithImpl(u)
+    override operator fun plus(other: pbandk.Message?): WrpHostMessageResStart =
+        protoMergeImpl(other)
 
-        override val descriptor: pbandk.MessageDescriptor<dev.pbkit.wrp.WrpHostMessageResStart> by lazy {
-            val fieldsList = ArrayList<pbandk.FieldDescriptor<dev.pbkit.wrp.WrpHostMessageResStart, *>>(2)
+    override val descriptor: pbandk.MessageDescriptor<WrpHostMessageResStart> get() = Companion.descriptor
+    override val protoSize: Int by lazy { super.protoSize }
+
+    companion object : pbandk.Message.Companion<WrpHostMessageResStart> {
+        val defaultInstance: WrpHostMessageResStart by lazy { WrpHostMessageResStart() }
+        override fun decodeWith(u: pbandk.MessageDecoder): WrpHostMessageResStart =
+            WrpHostMessageResStart.decodeWithImpl(u)
+
+        override val descriptor: pbandk.MessageDescriptor<WrpHostMessageResStart> by lazy {
+            val fieldsList = ArrayList<pbandk.FieldDescriptor<WrpHostMessageResStart, *>>(2)
             fieldsList.apply {
                 add(
                     pbandk.FieldDescriptor(
@@ -253,7 +284,7 @@ public data class WrpHostMessageResStart(
                         number = 1,
                         type = pbandk.FieldDescriptor.Type.Primitive.String(),
                         jsonName = "reqId",
-                        value = dev.pbkit.wrp.WrpHostMessageResStart::reqId
+                        value = WrpHostMessageResStart::reqId
                     )
                 )
                 add(
@@ -261,35 +292,43 @@ public data class WrpHostMessageResStart(
                         messageDescriptor = this@Companion::descriptor,
                         name = "header",
                         number = 2,
-                        type = pbandk.FieldDescriptor.Type.Map<String, String>(keyType = pbandk.FieldDescriptor.Type.Primitive.String(), valueType = pbandk.FieldDescriptor.Type.Primitive.String()),
+                        type = pbandk.FieldDescriptor.Type.Map<String, String>(
+                            keyType = pbandk.FieldDescriptor.Type.Primitive.String(),
+                            valueType = pbandk.FieldDescriptor.Type.Primitive.String()
+                        ),
                         jsonName = "header",
-                        value = dev.pbkit.wrp.WrpHostMessageResStart::header
+                        value = WrpHostMessageResStart::header
                     )
                 )
             }
             pbandk.MessageDescriptor(
                 fullName = "pbkit.wrp.WrpHostMessage_ResStart",
-                messageClass = dev.pbkit.wrp.WrpHostMessageResStart::class,
+                messageClass = WrpHostMessageResStart::class,
                 messageCompanion = this,
                 fields = fieldsList
             )
         }
     }
 
-    public data class HeaderEntry(
+    data class HeaderEntry(
         override val key: String = "",
         override val value: String = "",
         override val unknownFields: Map<Int, pbandk.UnknownField> = emptyMap()
     ) : pbandk.Message, Map.Entry<String, String> {
-        override operator fun plus(other: pbandk.Message?): dev.pbkit.wrp.WrpHostMessageResStart.HeaderEntry = protoMergeImpl(other)
-        override val descriptor: pbandk.MessageDescriptor<dev.pbkit.wrp.WrpHostMessageResStart.HeaderEntry> get() = Companion.descriptor
-        override val protoSize: Int by lazy { super.protoSize }
-        public companion object : pbandk.Message.Companion<dev.pbkit.wrp.WrpHostMessageResStart.HeaderEntry> {
-            public val defaultInstance: dev.pbkit.wrp.WrpHostMessageResStart.HeaderEntry by lazy { dev.pbkit.wrp.WrpHostMessageResStart.HeaderEntry() }
-            override fun decodeWith(u: pbandk.MessageDecoder): dev.pbkit.wrp.WrpHostMessageResStart.HeaderEntry = dev.pbkit.wrp.WrpHostMessageResStart.HeaderEntry.decodeWithImpl(u)
+        override operator fun plus(other: pbandk.Message?): HeaderEntry =
+            protoMergeImpl(other)
 
-            override val descriptor: pbandk.MessageDescriptor<dev.pbkit.wrp.WrpHostMessageResStart.HeaderEntry> by lazy {
-                val fieldsList = ArrayList<pbandk.FieldDescriptor<dev.pbkit.wrp.WrpHostMessageResStart.HeaderEntry, *>>(2)
+        override val descriptor: pbandk.MessageDescriptor<HeaderEntry> get() = Companion.descriptor
+        override val protoSize: Int by lazy { super.protoSize }
+
+        companion object : pbandk.Message.Companion<HeaderEntry> {
+            val defaultInstance: HeaderEntry by lazy { HeaderEntry() }
+            override fun decodeWith(u: pbandk.MessageDecoder): HeaderEntry =
+                HeaderEntry.decodeWithImpl(u)
+
+            override val descriptor: pbandk.MessageDescriptor<HeaderEntry> by lazy {
+                val fieldsList =
+                    ArrayList<pbandk.FieldDescriptor<HeaderEntry, *>>(2)
                 fieldsList.apply {
                     add(
                         pbandk.FieldDescriptor(
@@ -298,7 +337,7 @@ public data class WrpHostMessageResStart(
                             number = 1,
                             type = pbandk.FieldDescriptor.Type.Primitive.String(),
                             jsonName = "key",
-                            value = dev.pbkit.wrp.WrpHostMessageResStart.HeaderEntry::key
+                            value = HeaderEntry::key
                         )
                     )
                     add(
@@ -308,13 +347,13 @@ public data class WrpHostMessageResStart(
                             number = 2,
                             type = pbandk.FieldDescriptor.Type.Primitive.String(),
                             jsonName = "value",
-                            value = dev.pbkit.wrp.WrpHostMessageResStart.HeaderEntry::value
+                            value = HeaderEntry::value
                         )
                     )
                 }
                 pbandk.MessageDescriptor(
                     fullName = "pbkit.wrp.WrpHostMessage_ResStart.HeaderEntry",
-                    messageClass = dev.pbkit.wrp.WrpHostMessageResStart.HeaderEntry::class,
+                    messageClass = HeaderEntry::class,
                     messageCompanion = this,
                     fields = fieldsList
                 )
@@ -324,20 +363,24 @@ public data class WrpHostMessageResStart(
 }
 
 @pbandk.Export
-public data class WrpHostMessageResPayload(
+data class WrpHostMessageResPayload(
     val reqId: String = "",
     val payload: pbandk.ByteArr = pbandk.ByteArr.empty,
     override val unknownFields: Map<Int, pbandk.UnknownField> = emptyMap()
 ) : pbandk.Message {
-    override operator fun plus(other: pbandk.Message?): dev.pbkit.wrp.WrpHostMessageResPayload = protoMergeImpl(other)
-    override val descriptor: pbandk.MessageDescriptor<dev.pbkit.wrp.WrpHostMessageResPayload> get() = Companion.descriptor
-    override val protoSize: Int by lazy { super.protoSize }
-    public companion object : pbandk.Message.Companion<dev.pbkit.wrp.WrpHostMessageResPayload> {
-        public val defaultInstance: dev.pbkit.wrp.WrpHostMessageResPayload by lazy { dev.pbkit.wrp.WrpHostMessageResPayload() }
-        override fun decodeWith(u: pbandk.MessageDecoder): dev.pbkit.wrp.WrpHostMessageResPayload = dev.pbkit.wrp.WrpHostMessageResPayload.decodeWithImpl(u)
+    override operator fun plus(other: pbandk.Message?): WrpHostMessageResPayload =
+        protoMergeImpl(other)
 
-        override val descriptor: pbandk.MessageDescriptor<dev.pbkit.wrp.WrpHostMessageResPayload> by lazy {
-            val fieldsList = ArrayList<pbandk.FieldDescriptor<dev.pbkit.wrp.WrpHostMessageResPayload, *>>(2)
+    override val descriptor: pbandk.MessageDescriptor<WrpHostMessageResPayload> get() = Companion.descriptor
+    override val protoSize: Int by lazy { super.protoSize }
+
+    companion object : pbandk.Message.Companion<WrpHostMessageResPayload> {
+        val defaultInstance: WrpHostMessageResPayload by lazy { WrpHostMessageResPayload() }
+        override fun decodeWith(u: pbandk.MessageDecoder): WrpHostMessageResPayload =
+            WrpHostMessageResPayload.decodeWithImpl(u)
+
+        override val descriptor: pbandk.MessageDescriptor<WrpHostMessageResPayload> by lazy {
+            val fieldsList = ArrayList<pbandk.FieldDescriptor<WrpHostMessageResPayload, *>>(2)
             fieldsList.apply {
                 add(
                     pbandk.FieldDescriptor(
@@ -346,7 +389,7 @@ public data class WrpHostMessageResPayload(
                         number = 1,
                         type = pbandk.FieldDescriptor.Type.Primitive.String(),
                         jsonName = "reqId",
-                        value = dev.pbkit.wrp.WrpHostMessageResPayload::reqId
+                        value = WrpHostMessageResPayload::reqId
                     )
                 )
                 add(
@@ -356,13 +399,13 @@ public data class WrpHostMessageResPayload(
                         number = 2,
                         type = pbandk.FieldDescriptor.Type.Primitive.Bytes(),
                         jsonName = "payload",
-                        value = dev.pbkit.wrp.WrpHostMessageResPayload::payload
+                        value = WrpHostMessageResPayload::payload
                     )
                 )
             }
             pbandk.MessageDescriptor(
                 fullName = "pbkit.wrp.WrpHostMessage_ResPayload",
-                messageClass = dev.pbkit.wrp.WrpHostMessageResPayload::class,
+                messageClass = WrpHostMessageResPayload::class,
                 messageCompanion = this,
                 fields = fieldsList
             )
@@ -371,20 +414,24 @@ public data class WrpHostMessageResPayload(
 }
 
 @pbandk.Export
-public data class WrpHostMessageResFinish(
+data class WrpHostMessageResFinish(
     val reqId: String = "",
     val trailer: Map<String, String> = emptyMap(),
     override val unknownFields: Map<Int, pbandk.UnknownField> = emptyMap()
 ) : pbandk.Message {
-    override operator fun plus(other: pbandk.Message?): dev.pbkit.wrp.WrpHostMessageResFinish = protoMergeImpl(other)
-    override val descriptor: pbandk.MessageDescriptor<dev.pbkit.wrp.WrpHostMessageResFinish> get() = Companion.descriptor
-    override val protoSize: Int by lazy { super.protoSize }
-    public companion object : pbandk.Message.Companion<dev.pbkit.wrp.WrpHostMessageResFinish> {
-        public val defaultInstance: dev.pbkit.wrp.WrpHostMessageResFinish by lazy { dev.pbkit.wrp.WrpHostMessageResFinish() }
-        override fun decodeWith(u: pbandk.MessageDecoder): dev.pbkit.wrp.WrpHostMessageResFinish = dev.pbkit.wrp.WrpHostMessageResFinish.decodeWithImpl(u)
+    override operator fun plus(other: pbandk.Message?): WrpHostMessageResFinish =
+        protoMergeImpl(other)
 
-        override val descriptor: pbandk.MessageDescriptor<dev.pbkit.wrp.WrpHostMessageResFinish> by lazy {
-            val fieldsList = ArrayList<pbandk.FieldDescriptor<dev.pbkit.wrp.WrpHostMessageResFinish, *>>(2)
+    override val descriptor: pbandk.MessageDescriptor<WrpHostMessageResFinish> get() = Companion.descriptor
+    override val protoSize: Int by lazy { super.protoSize }
+
+    companion object : pbandk.Message.Companion<WrpHostMessageResFinish> {
+        val defaultInstance: WrpHostMessageResFinish by lazy { WrpHostMessageResFinish() }
+        override fun decodeWith(u: pbandk.MessageDecoder): WrpHostMessageResFinish =
+            WrpHostMessageResFinish.decodeWithImpl(u)
+
+        override val descriptor: pbandk.MessageDescriptor<WrpHostMessageResFinish> by lazy {
+            val fieldsList = ArrayList<pbandk.FieldDescriptor<WrpHostMessageResFinish, *>>(2)
             fieldsList.apply {
                 add(
                     pbandk.FieldDescriptor(
@@ -393,7 +440,7 @@ public data class WrpHostMessageResFinish(
                         number = 1,
                         type = pbandk.FieldDescriptor.Type.Primitive.String(),
                         jsonName = "reqId",
-                        value = dev.pbkit.wrp.WrpHostMessageResFinish::reqId
+                        value = WrpHostMessageResFinish::reqId
                     )
                 )
                 add(
@@ -401,35 +448,43 @@ public data class WrpHostMessageResFinish(
                         messageDescriptor = this@Companion::descriptor,
                         name = "trailer",
                         number = 2,
-                        type = pbandk.FieldDescriptor.Type.Map<String, String>(keyType = pbandk.FieldDescriptor.Type.Primitive.String(), valueType = pbandk.FieldDescriptor.Type.Primitive.String()),
+                        type = pbandk.FieldDescriptor.Type.Map<String, String>(
+                            keyType = pbandk.FieldDescriptor.Type.Primitive.String(),
+                            valueType = pbandk.FieldDescriptor.Type.Primitive.String()
+                        ),
                         jsonName = "trailer",
-                        value = dev.pbkit.wrp.WrpHostMessageResFinish::trailer
+                        value = WrpHostMessageResFinish::trailer
                     )
                 )
             }
             pbandk.MessageDescriptor(
                 fullName = "pbkit.wrp.WrpHostMessage_ResFinish",
-                messageClass = dev.pbkit.wrp.WrpHostMessageResFinish::class,
+                messageClass = WrpHostMessageResFinish::class,
                 messageCompanion = this,
                 fields = fieldsList
             )
         }
     }
 
-    public data class TrailerEntry(
+    data class TrailerEntry(
         override val key: String = "",
         override val value: String = "",
         override val unknownFields: Map<Int, pbandk.UnknownField> = emptyMap()
     ) : pbandk.Message, Map.Entry<String, String> {
-        override operator fun plus(other: pbandk.Message?): dev.pbkit.wrp.WrpHostMessageResFinish.TrailerEntry = protoMergeImpl(other)
-        override val descriptor: pbandk.MessageDescriptor<dev.pbkit.wrp.WrpHostMessageResFinish.TrailerEntry> get() = Companion.descriptor
-        override val protoSize: Int by lazy { super.protoSize }
-        public companion object : pbandk.Message.Companion<dev.pbkit.wrp.WrpHostMessageResFinish.TrailerEntry> {
-            public val defaultInstance: dev.pbkit.wrp.WrpHostMessageResFinish.TrailerEntry by lazy { dev.pbkit.wrp.WrpHostMessageResFinish.TrailerEntry() }
-            override fun decodeWith(u: pbandk.MessageDecoder): dev.pbkit.wrp.WrpHostMessageResFinish.TrailerEntry = dev.pbkit.wrp.WrpHostMessageResFinish.TrailerEntry.decodeWithImpl(u)
+        override operator fun plus(other: pbandk.Message?): TrailerEntry =
+            protoMergeImpl(other)
 
-            override val descriptor: pbandk.MessageDescriptor<dev.pbkit.wrp.WrpHostMessageResFinish.TrailerEntry> by lazy {
-                val fieldsList = ArrayList<pbandk.FieldDescriptor<dev.pbkit.wrp.WrpHostMessageResFinish.TrailerEntry, *>>(2)
+        override val descriptor: pbandk.MessageDescriptor<TrailerEntry> get() = Companion.descriptor
+        override val protoSize: Int by lazy { super.protoSize }
+
+        companion object : pbandk.Message.Companion<TrailerEntry> {
+            val defaultInstance: TrailerEntry by lazy { TrailerEntry() }
+            override fun decodeWith(u: pbandk.MessageDecoder): TrailerEntry =
+                TrailerEntry.decodeWithImpl(u)
+
+            override val descriptor: pbandk.MessageDescriptor<TrailerEntry> by lazy {
+                val fieldsList =
+                    ArrayList<pbandk.FieldDescriptor<TrailerEntry, *>>(2)
                 fieldsList.apply {
                     add(
                         pbandk.FieldDescriptor(
@@ -438,7 +493,7 @@ public data class WrpHostMessageResFinish(
                             number = 1,
                             type = pbandk.FieldDescriptor.Type.Primitive.String(),
                             jsonName = "key",
-                            value = dev.pbkit.wrp.WrpHostMessageResFinish.TrailerEntry::key
+                            value = TrailerEntry::key
                         )
                     )
                     add(
@@ -448,13 +503,13 @@ public data class WrpHostMessageResFinish(
                             number = 2,
                             type = pbandk.FieldDescriptor.Type.Primitive.String(),
                             jsonName = "value",
-                            value = dev.pbkit.wrp.WrpHostMessageResFinish.TrailerEntry::value
+                            value = TrailerEntry::value
                         )
                     )
                 }
                 pbandk.MessageDescriptor(
                     fullName = "pbkit.wrp.WrpHostMessage_ResFinish.TrailerEntry",
-                    messageClass = dev.pbkit.wrp.WrpHostMessageResFinish.TrailerEntry::class,
+                    messageClass = TrailerEntry::class,
                     messageCompanion = this,
                     fields = fieldsList
                 )
@@ -464,21 +519,25 @@ public data class WrpHostMessageResFinish(
 }
 
 @pbandk.Export
-public data class WrpGuestMessageReqStart(
+data class WrpGuestMessageReqStart(
     val reqId: String = "",
     val methodName: String = "",
     val metadata: Map<String, String> = emptyMap(),
     override val unknownFields: Map<Int, pbandk.UnknownField> = emptyMap()
 ) : pbandk.Message {
-    override operator fun plus(other: pbandk.Message?): dev.pbkit.wrp.WrpGuestMessageReqStart = protoMergeImpl(other)
-    override val descriptor: pbandk.MessageDescriptor<dev.pbkit.wrp.WrpGuestMessageReqStart> get() = Companion.descriptor
-    override val protoSize: Int by lazy { super.protoSize }
-    public companion object : pbandk.Message.Companion<dev.pbkit.wrp.WrpGuestMessageReqStart> {
-        public val defaultInstance: dev.pbkit.wrp.WrpGuestMessageReqStart by lazy { dev.pbkit.wrp.WrpGuestMessageReqStart() }
-        override fun decodeWith(u: pbandk.MessageDecoder): dev.pbkit.wrp.WrpGuestMessageReqStart = dev.pbkit.wrp.WrpGuestMessageReqStart.decodeWithImpl(u)
+    override operator fun plus(other: pbandk.Message?): WrpGuestMessageReqStart =
+        protoMergeImpl(other)
 
-        override val descriptor: pbandk.MessageDescriptor<dev.pbkit.wrp.WrpGuestMessageReqStart> by lazy {
-            val fieldsList = ArrayList<pbandk.FieldDescriptor<dev.pbkit.wrp.WrpGuestMessageReqStart, *>>(3)
+    override val descriptor: pbandk.MessageDescriptor<WrpGuestMessageReqStart> get() = Companion.descriptor
+    override val protoSize: Int by lazy { super.protoSize }
+
+    companion object : pbandk.Message.Companion<WrpGuestMessageReqStart> {
+        val defaultInstance: WrpGuestMessageReqStart by lazy { WrpGuestMessageReqStart() }
+        override fun decodeWith(u: pbandk.MessageDecoder): WrpGuestMessageReqStart =
+            WrpGuestMessageReqStart.decodeWithImpl(u)
+
+        override val descriptor: pbandk.MessageDescriptor<WrpGuestMessageReqStart> by lazy {
+            val fieldsList = ArrayList<pbandk.FieldDescriptor<WrpGuestMessageReqStart, *>>(3)
             fieldsList.apply {
                 add(
                     pbandk.FieldDescriptor(
@@ -487,7 +546,7 @@ public data class WrpGuestMessageReqStart(
                         number = 1,
                         type = pbandk.FieldDescriptor.Type.Primitive.String(),
                         jsonName = "reqId",
-                        value = dev.pbkit.wrp.WrpGuestMessageReqStart::reqId
+                        value = WrpGuestMessageReqStart::reqId
                     )
                 )
                 add(
@@ -497,7 +556,7 @@ public data class WrpGuestMessageReqStart(
                         number = 2,
                         type = pbandk.FieldDescriptor.Type.Primitive.String(),
                         jsonName = "methodName",
-                        value = dev.pbkit.wrp.WrpGuestMessageReqStart::methodName
+                        value = WrpGuestMessageReqStart::methodName
                     )
                 )
                 add(
@@ -505,35 +564,43 @@ public data class WrpGuestMessageReqStart(
                         messageDescriptor = this@Companion::descriptor,
                         name = "metadata",
                         number = 3,
-                        type = pbandk.FieldDescriptor.Type.Map<String, String>(keyType = pbandk.FieldDescriptor.Type.Primitive.String(), valueType = pbandk.FieldDescriptor.Type.Primitive.String()),
+                        type = pbandk.FieldDescriptor.Type.Map<String, String>(
+                            keyType = pbandk.FieldDescriptor.Type.Primitive.String(),
+                            valueType = pbandk.FieldDescriptor.Type.Primitive.String()
+                        ),
                         jsonName = "metadata",
-                        value = dev.pbkit.wrp.WrpGuestMessageReqStart::metadata
+                        value = WrpGuestMessageReqStart::metadata
                     )
                 )
             }
             pbandk.MessageDescriptor(
                 fullName = "pbkit.wrp.WrpGuestMessage_ReqStart",
-                messageClass = dev.pbkit.wrp.WrpGuestMessageReqStart::class,
+                messageClass = WrpGuestMessageReqStart::class,
                 messageCompanion = this,
                 fields = fieldsList
             )
         }
     }
 
-    public data class MetadataEntry(
+    data class MetadataEntry(
         override val key: String = "",
         override val value: String = "",
         override val unknownFields: Map<Int, pbandk.UnknownField> = emptyMap()
     ) : pbandk.Message, Map.Entry<String, String> {
-        override operator fun plus(other: pbandk.Message?): dev.pbkit.wrp.WrpGuestMessageReqStart.MetadataEntry = protoMergeImpl(other)
-        override val descriptor: pbandk.MessageDescriptor<dev.pbkit.wrp.WrpGuestMessageReqStart.MetadataEntry> get() = Companion.descriptor
-        override val protoSize: Int by lazy { super.protoSize }
-        public companion object : pbandk.Message.Companion<dev.pbkit.wrp.WrpGuestMessageReqStart.MetadataEntry> {
-            public val defaultInstance: dev.pbkit.wrp.WrpGuestMessageReqStart.MetadataEntry by lazy { dev.pbkit.wrp.WrpGuestMessageReqStart.MetadataEntry() }
-            override fun decodeWith(u: pbandk.MessageDecoder): dev.pbkit.wrp.WrpGuestMessageReqStart.MetadataEntry = dev.pbkit.wrp.WrpGuestMessageReqStart.MetadataEntry.decodeWithImpl(u)
+        override operator fun plus(other: pbandk.Message?): MetadataEntry =
+            protoMergeImpl(other)
 
-            override val descriptor: pbandk.MessageDescriptor<dev.pbkit.wrp.WrpGuestMessageReqStart.MetadataEntry> by lazy {
-                val fieldsList = ArrayList<pbandk.FieldDescriptor<dev.pbkit.wrp.WrpGuestMessageReqStart.MetadataEntry, *>>(2)
+        override val descriptor: pbandk.MessageDescriptor<MetadataEntry> get() = Companion.descriptor
+        override val protoSize: Int by lazy { super.protoSize }
+
+        companion object : pbandk.Message.Companion<MetadataEntry> {
+            val defaultInstance: MetadataEntry by lazy { MetadataEntry() }
+            override fun decodeWith(u: pbandk.MessageDecoder): MetadataEntry =
+                MetadataEntry.decodeWithImpl(u)
+
+            override val descriptor: pbandk.MessageDescriptor<MetadataEntry> by lazy {
+                val fieldsList =
+                    ArrayList<pbandk.FieldDescriptor<MetadataEntry, *>>(2)
                 fieldsList.apply {
                     add(
                         pbandk.FieldDescriptor(
@@ -542,7 +609,7 @@ public data class WrpGuestMessageReqStart(
                             number = 1,
                             type = pbandk.FieldDescriptor.Type.Primitive.String(),
                             jsonName = "key",
-                            value = dev.pbkit.wrp.WrpGuestMessageReqStart.MetadataEntry::key
+                            value = MetadataEntry::key
                         )
                     )
                     add(
@@ -552,13 +619,13 @@ public data class WrpGuestMessageReqStart(
                             number = 2,
                             type = pbandk.FieldDescriptor.Type.Primitive.String(),
                             jsonName = "value",
-                            value = dev.pbkit.wrp.WrpGuestMessageReqStart.MetadataEntry::value
+                            value = MetadataEntry::value
                         )
                     )
                 }
                 pbandk.MessageDescriptor(
                     fullName = "pbkit.wrp.WrpGuestMessage_ReqStart.MetadataEntry",
-                    messageClass = dev.pbkit.wrp.WrpGuestMessageReqStart.MetadataEntry::class,
+                    messageClass = MetadataEntry::class,
                     messageCompanion = this,
                     fields = fieldsList
                 )
@@ -568,20 +635,25 @@ public data class WrpGuestMessageReqStart(
 }
 
 @pbandk.Export
-public data class WrpGuestMessageReqPayload(
+data class WrpGuestMessageReqPayload(
     val reqId: String = "",
     val payload: pbandk.ByteArr = pbandk.ByteArr.empty,
     override val unknownFields: Map<Int, pbandk.UnknownField> = emptyMap()
 ) : pbandk.Message {
-    override operator fun plus(other: pbandk.Message?): dev.pbkit.wrp.WrpGuestMessageReqPayload = protoMergeImpl(other)
-    override val descriptor: pbandk.MessageDescriptor<dev.pbkit.wrp.WrpGuestMessageReqPayload> get() = Companion.descriptor
-    override val protoSize: Int by lazy { super.protoSize }
-    public companion object : pbandk.Message.Companion<dev.pbkit.wrp.WrpGuestMessageReqPayload> {
-        public val defaultInstance: dev.pbkit.wrp.WrpGuestMessageReqPayload by lazy { dev.pbkit.wrp.WrpGuestMessageReqPayload() }
-        override fun decodeWith(u: pbandk.MessageDecoder): dev.pbkit.wrp.WrpGuestMessageReqPayload = dev.pbkit.wrp.WrpGuestMessageReqPayload.decodeWithImpl(u)
+    override operator fun plus(other: pbandk.Message?): WrpGuestMessageReqPayload =
+        protoMergeImpl(other)
 
-        override val descriptor: pbandk.MessageDescriptor<dev.pbkit.wrp.WrpGuestMessageReqPayload> by lazy {
-            val fieldsList = ArrayList<pbandk.FieldDescriptor<dev.pbkit.wrp.WrpGuestMessageReqPayload, *>>(2)
+    override val descriptor: pbandk.MessageDescriptor<WrpGuestMessageReqPayload> get() = Companion.descriptor
+    override val protoSize: Int by lazy { super.protoSize }
+
+    companion object : pbandk.Message.Companion<WrpGuestMessageReqPayload> {
+        val defaultInstance: WrpGuestMessageReqPayload by lazy { WrpGuestMessageReqPayload() }
+        override fun decodeWith(u: pbandk.MessageDecoder): WrpGuestMessageReqPayload =
+            WrpGuestMessageReqPayload.decodeWithImpl(u)
+
+        override val descriptor: pbandk.MessageDescriptor<WrpGuestMessageReqPayload> by lazy {
+            val fieldsList =
+                ArrayList<pbandk.FieldDescriptor<WrpGuestMessageReqPayload, *>>(2)
             fieldsList.apply {
                 add(
                     pbandk.FieldDescriptor(
@@ -590,7 +662,7 @@ public data class WrpGuestMessageReqPayload(
                         number = 1,
                         type = pbandk.FieldDescriptor.Type.Primitive.String(),
                         jsonName = "reqId",
-                        value = dev.pbkit.wrp.WrpGuestMessageReqPayload::reqId
+                        value = WrpGuestMessageReqPayload::reqId
                     )
                 )
                 add(
@@ -600,13 +672,13 @@ public data class WrpGuestMessageReqPayload(
                         number = 2,
                         type = pbandk.FieldDescriptor.Type.Primitive.Bytes(),
                         jsonName = "payload",
-                        value = dev.pbkit.wrp.WrpGuestMessageReqPayload::payload
+                        value = WrpGuestMessageReqPayload::payload
                     )
                 )
             }
             pbandk.MessageDescriptor(
                 fullName = "pbkit.wrp.WrpGuestMessage_ReqPayload",
-                messageClass = dev.pbkit.wrp.WrpGuestMessageReqPayload::class,
+                messageClass = WrpGuestMessageReqPayload::class,
                 messageCompanion = this,
                 fields = fieldsList
             )
@@ -615,19 +687,24 @@ public data class WrpGuestMessageReqPayload(
 }
 
 @pbandk.Export
-public data class WrpGuestMessageReqFinish(
+data class WrpGuestMessageReqFinish(
     val reqId: String = "",
     override val unknownFields: Map<Int, pbandk.UnknownField> = emptyMap()
 ) : pbandk.Message {
-    override operator fun plus(other: pbandk.Message?): dev.pbkit.wrp.WrpGuestMessageReqFinish = protoMergeImpl(other)
-    override val descriptor: pbandk.MessageDescriptor<dev.pbkit.wrp.WrpGuestMessageReqFinish> get() = Companion.descriptor
-    override val protoSize: Int by lazy { super.protoSize }
-    public companion object : pbandk.Message.Companion<dev.pbkit.wrp.WrpGuestMessageReqFinish> {
-        public val defaultInstance: dev.pbkit.wrp.WrpGuestMessageReqFinish by lazy { dev.pbkit.wrp.WrpGuestMessageReqFinish() }
-        override fun decodeWith(u: pbandk.MessageDecoder): dev.pbkit.wrp.WrpGuestMessageReqFinish = dev.pbkit.wrp.WrpGuestMessageReqFinish.decodeWithImpl(u)
+    override operator fun plus(other: pbandk.Message?): WrpGuestMessageReqFinish =
+        protoMergeImpl(other)
 
-        override val descriptor: pbandk.MessageDescriptor<dev.pbkit.wrp.WrpGuestMessageReqFinish> by lazy {
-            val fieldsList = ArrayList<pbandk.FieldDescriptor<dev.pbkit.wrp.WrpGuestMessageReqFinish, *>>(1)
+    override val descriptor: pbandk.MessageDescriptor<WrpGuestMessageReqFinish> get() = Companion.descriptor
+    override val protoSize: Int by lazy { super.protoSize }
+
+    companion object : pbandk.Message.Companion<WrpGuestMessageReqFinish> {
+        val defaultInstance: WrpGuestMessageReqFinish by lazy { WrpGuestMessageReqFinish() }
+        override fun decodeWith(u: pbandk.MessageDecoder): WrpGuestMessageReqFinish =
+            WrpGuestMessageReqFinish.decodeWithImpl(u)
+
+        override val descriptor: pbandk.MessageDescriptor<WrpGuestMessageReqFinish> by lazy {
+            val fieldsList =
+                ArrayList<pbandk.FieldDescriptor<WrpGuestMessageReqFinish, *>>(1)
             fieldsList.apply {
                 add(
                     pbandk.FieldDescriptor(
@@ -636,13 +713,13 @@ public data class WrpGuestMessageReqFinish(
                         number = 1,
                         type = pbandk.FieldDescriptor.Type.Primitive.String(),
                         jsonName = "reqId",
-                        value = dev.pbkit.wrp.WrpGuestMessageReqFinish::reqId
+                        value = WrpGuestMessageReqFinish::reqId
                     )
                 )
             }
             pbandk.MessageDescriptor(
                 fullName = "pbkit.wrp.WrpGuestMessage_ReqFinish",
-                messageClass = dev.pbkit.wrp.WrpGuestMessageReqFinish::class,
+                messageClass = WrpGuestMessageReqFinish::class,
                 messageCompanion = this,
                 fields = fieldsList
             )
@@ -651,19 +728,24 @@ public data class WrpGuestMessageReqFinish(
 }
 
 @pbandk.Export
-public data class WrpGuestMessageResFinish(
+data class WrpGuestMessageResFinish(
     val reqId: String = "",
     override val unknownFields: Map<Int, pbandk.UnknownField> = emptyMap()
 ) : pbandk.Message {
-    override operator fun plus(other: pbandk.Message?): dev.pbkit.wrp.WrpGuestMessageResFinish = protoMergeImpl(other)
-    override val descriptor: pbandk.MessageDescriptor<dev.pbkit.wrp.WrpGuestMessageResFinish> get() = Companion.descriptor
-    override val protoSize: Int by lazy { super.protoSize }
-    public companion object : pbandk.Message.Companion<dev.pbkit.wrp.WrpGuestMessageResFinish> {
-        public val defaultInstance: dev.pbkit.wrp.WrpGuestMessageResFinish by lazy { dev.pbkit.wrp.WrpGuestMessageResFinish() }
-        override fun decodeWith(u: pbandk.MessageDecoder): dev.pbkit.wrp.WrpGuestMessageResFinish = dev.pbkit.wrp.WrpGuestMessageResFinish.decodeWithImpl(u)
+    override operator fun plus(other: pbandk.Message?): WrpGuestMessageResFinish =
+        protoMergeImpl(other)
 
-        override val descriptor: pbandk.MessageDescriptor<dev.pbkit.wrp.WrpGuestMessageResFinish> by lazy {
-            val fieldsList = ArrayList<pbandk.FieldDescriptor<dev.pbkit.wrp.WrpGuestMessageResFinish, *>>(1)
+    override val descriptor: pbandk.MessageDescriptor<WrpGuestMessageResFinish> get() = Companion.descriptor
+    override val protoSize: Int by lazy { super.protoSize }
+
+    companion object : pbandk.Message.Companion<WrpGuestMessageResFinish> {
+        val defaultInstance: WrpGuestMessageResFinish by lazy { WrpGuestMessageResFinish() }
+        override fun decodeWith(u: pbandk.MessageDecoder): WrpGuestMessageResFinish =
+            WrpGuestMessageResFinish.decodeWithImpl(u)
+
+        override val descriptor: pbandk.MessageDescriptor<WrpGuestMessageResFinish> by lazy {
+            val fieldsList =
+                ArrayList<pbandk.FieldDescriptor<WrpGuestMessageResFinish, *>>(1)
             fieldsList.apply {
                 add(
                     pbandk.FieldDescriptor(
@@ -672,13 +754,13 @@ public data class WrpGuestMessageResFinish(
                         number = 1,
                         type = pbandk.FieldDescriptor.Type.Primitive.String(),
                         jsonName = "reqId",
-                        value = dev.pbkit.wrp.WrpGuestMessageResFinish::reqId
+                        value = WrpGuestMessageResFinish::reqId
                     )
                 )
             }
             pbandk.MessageDescriptor(
                 fullName = "pbkit.wrp.WrpGuestMessage_ResFinish",
-                messageClass = dev.pbkit.wrp.WrpGuestMessageResFinish::class,
+                messageClass = WrpGuestMessageResFinish::class,
                 messageCompanion = this,
                 fields = fieldsList
             )
@@ -688,10 +770,10 @@ public data class WrpGuestMessageResFinish(
 
 @pbandk.Export
 @pbandk.JsName("orDefaultForWrpMessage")
-public fun WrpMessage?.orDefault(): dev.pbkit.wrp.WrpMessage = this ?: WrpMessage.defaultInstance
+fun WrpMessage?.orDefault(): WrpMessage = this ?: WrpMessage.defaultInstance
 
-private fun WrpMessage.protoMergeImpl(plus: pbandk.Message?): WrpMessage = (plus as? WrpMessage)?.let {
-    it.copy(
+private fun WrpMessage.protoMergeImpl(plus: pbandk.Message?): WrpMessage =
+    (plus as? WrpMessage)?.copy(
         message = when {
             message is WrpMessage.Message.HostInitialize && plus.message is WrpMessage.Message.HostInitialize ->
                 WrpMessage.Message.HostInitialize(message.value + plus.message.value)
@@ -715,8 +797,7 @@ private fun WrpMessage.protoMergeImpl(plus: pbandk.Message?): WrpMessage = (plus
                 plus.message ?: message
         },
         unknownFields = unknownFields + plus.unknownFields
-    )
-} ?: this
+    ) ?: this
 
 @Suppress("UNCHECKED_CAST")
 private fun WrpMessage.Companion.decodeWithImpl(u: pbandk.MessageDecoder): WrpMessage {
@@ -724,15 +805,20 @@ private fun WrpMessage.Companion.decodeWithImpl(u: pbandk.MessageDecoder): WrpMe
 
     val unknownFields = u.readMessage(this) { _fieldNumber, _fieldValue ->
         when (_fieldNumber) {
-            1 -> message = WrpMessage.Message.HostInitialize(_fieldValue as dev.pbkit.wrp.WrpHostMessageInitialize)
-            2 -> message = WrpMessage.Message.HostError(_fieldValue as dev.pbkit.wrp.WrpHostMessageError)
-            3 -> message = WrpMessage.Message.HostResStart(_fieldValue as dev.pbkit.wrp.WrpHostMessageResStart)
-            4 -> message = WrpMessage.Message.HostResPayload(_fieldValue as dev.pbkit.wrp.WrpHostMessageResPayload)
-            5 -> message = WrpMessage.Message.HostResFinish(_fieldValue as dev.pbkit.wrp.WrpHostMessageResFinish)
-            6 -> message = WrpMessage.Message.GuestReqStart(_fieldValue as dev.pbkit.wrp.WrpGuestMessageReqStart)
-            7 -> message = WrpMessage.Message.GuestReqPayload(_fieldValue as dev.pbkit.wrp.WrpGuestMessageReqPayload)
-            8 -> message = WrpMessage.Message.GuestReqFinish(_fieldValue as dev.pbkit.wrp.WrpGuestMessageReqFinish)
-            9 -> message = WrpMessage.Message.GuestResFinish(_fieldValue as dev.pbkit.wrp.WrpGuestMessageResFinish)
+            1 -> message =
+                WrpMessage.Message.HostInitialize(_fieldValue as WrpHostMessageInitialize)
+            2 -> message = WrpMessage.Message.HostError(_fieldValue as WrpHostMessageError)
+            3 -> message = WrpMessage.Message.HostResStart(_fieldValue as WrpHostMessageResStart)
+            4 -> message =
+                WrpMessage.Message.HostResPayload(_fieldValue as WrpHostMessageResPayload)
+            5 -> message = WrpMessage.Message.HostResFinish(_fieldValue as WrpHostMessageResFinish)
+            6 -> message = WrpMessage.Message.GuestReqStart(_fieldValue as WrpGuestMessageReqStart)
+            7 -> message =
+                WrpMessage.Message.GuestReqPayload(_fieldValue as WrpGuestMessageReqPayload)
+            8 -> message =
+                WrpMessage.Message.GuestReqFinish(_fieldValue as WrpGuestMessageReqFinish)
+            9 -> message =
+                WrpMessage.Message.GuestResFinish(_fieldValue as WrpGuestMessageResFinish)
         }
     }
     return WrpMessage(message, unknownFields)
@@ -740,14 +826,16 @@ private fun WrpMessage.Companion.decodeWithImpl(u: pbandk.MessageDecoder): WrpMe
 
 @pbandk.Export
 @pbandk.JsName("orDefaultForWrpHostMessageInitialize")
-public fun WrpHostMessageInitialize?.orDefault(): dev.pbkit.wrp.WrpHostMessageInitialize = this ?: WrpHostMessageInitialize.defaultInstance
+fun WrpHostMessageInitialize?.orDefault(): WrpHostMessageInitialize =
+    this ?: WrpHostMessageInitialize.defaultInstance
 
-private fun WrpHostMessageInitialize.protoMergeImpl(plus: pbandk.Message?): WrpHostMessageInitialize = (plus as? WrpHostMessageInitialize)?.let {
-    it.copy(
-        availableMethods = availableMethods + plus.availableMethods,
-        unknownFields = unknownFields + plus.unknownFields
-    )
-} ?: this
+private fun WrpHostMessageInitialize.protoMergeImpl(plus: pbandk.Message?): WrpHostMessageInitialize =
+    (plus as? WrpHostMessageInitialize)?.let {
+        it.copy(
+            availableMethods = availableMethods + plus.availableMethods,
+            unknownFields = unknownFields + plus.unknownFields
+        )
+    } ?: this
 
 @Suppress("UNCHECKED_CAST")
 private fun WrpHostMessageInitialize.Companion.decodeWithImpl(u: pbandk.MessageDecoder): WrpHostMessageInitialize {
@@ -755,21 +843,25 @@ private fun WrpHostMessageInitialize.Companion.decodeWithImpl(u: pbandk.MessageD
 
     val unknownFields = u.readMessage(this) { _fieldNumber, _fieldValue ->
         when (_fieldNumber) {
-            1 -> availableMethods = (availableMethods ?: pbandk.ListWithSize.Builder()).apply { this += _fieldValue as Sequence<String> }
+            1 -> availableMethods = (availableMethods
+                ?: pbandk.ListWithSize.Builder()).apply { this += _fieldValue as Sequence<String> }
         }
     }
-    return WrpHostMessageInitialize(pbandk.ListWithSize.Builder.fixed(availableMethods), unknownFields)
+    return WrpHostMessageInitialize(
+        pbandk.ListWithSize.Builder.fixed(availableMethods),
+        unknownFields
+    )
 }
 
 @pbandk.Export
 @pbandk.JsName("orDefaultForWrpHostMessageError")
-public fun WrpHostMessageError?.orDefault(): dev.pbkit.wrp.WrpHostMessageError = this ?: WrpHostMessageError.defaultInstance
+fun WrpHostMessageError?.orDefault(): WrpHostMessageError =
+    this ?: WrpHostMessageError.defaultInstance
 
-private fun WrpHostMessageError.protoMergeImpl(plus: pbandk.Message?): WrpHostMessageError = (plus as? WrpHostMessageError)?.let {
-    it.copy(
+private fun WrpHostMessageError.protoMergeImpl(plus: pbandk.Message?): WrpHostMessageError =
+    (plus as? WrpHostMessageError)?.copy(
         unknownFields = unknownFields + plus.unknownFields
-    )
-} ?: this
+    ) ?: this
 
 @Suppress("UNCHECKED_CAST")
 private fun WrpHostMessageError.Companion.decodeWithImpl(u: pbandk.MessageDecoder): WrpHostMessageError {
@@ -785,14 +877,14 @@ private fun WrpHostMessageError.Companion.decodeWithImpl(u: pbandk.MessageDecode
 
 @pbandk.Export
 @pbandk.JsName("orDefaultForWrpHostMessageResStart")
-public fun WrpHostMessageResStart?.orDefault(): dev.pbkit.wrp.WrpHostMessageResStart = this ?: WrpHostMessageResStart.defaultInstance
+fun WrpHostMessageResStart?.orDefault(): WrpHostMessageResStart =
+    this ?: WrpHostMessageResStart.defaultInstance
 
-private fun WrpHostMessageResStart.protoMergeImpl(plus: pbandk.Message?): WrpHostMessageResStart = (plus as? WrpHostMessageResStart)?.let {
-    it.copy(
+private fun WrpHostMessageResStart.protoMergeImpl(plus: pbandk.Message?): WrpHostMessageResStart =
+    (plus as? WrpHostMessageResStart)?.copy(
         header = header + plus.header,
         unknownFields = unknownFields + plus.unknownFields
-    )
-} ?: this
+    ) ?: this
 
 @Suppress("UNCHECKED_CAST")
 private fun WrpHostMessageResStart.Companion.decodeWithImpl(u: pbandk.MessageDecoder): WrpHostMessageResStart {
@@ -802,7 +894,8 @@ private fun WrpHostMessageResStart.Companion.decodeWithImpl(u: pbandk.MessageDec
     val unknownFields = u.readMessage(this) { _fieldNumber, _fieldValue ->
         when (_fieldNumber) {
             1 -> reqId = _fieldValue as String
-            2 -> header = (header ?: pbandk.MessageMap.Builder()).apply { this.entries += _fieldValue as Sequence<pbandk.MessageMap.Entry<String, String>> }
+            2 -> header = (header
+                ?: pbandk.MessageMap.Builder()).apply { this.entries += _fieldValue as Sequence<pbandk.MessageMap.Entry<String, String>> }
         }
     }
     return WrpHostMessageResStart(reqId, pbandk.MessageMap.Builder.fixed(header), unknownFields)
@@ -810,13 +903,13 @@ private fun WrpHostMessageResStart.Companion.decodeWithImpl(u: pbandk.MessageDec
 
 @pbandk.Export
 @pbandk.JsName("orDefaultForWrpHostMessageResStartHeaderEntry")
-public fun WrpHostMessageResStart.HeaderEntry?.orDefault(): dev.pbkit.wrp.WrpHostMessageResStart.HeaderEntry = this ?: WrpHostMessageResStart.HeaderEntry.defaultInstance
+fun WrpHostMessageResStart.HeaderEntry?.orDefault(): WrpHostMessageResStart.HeaderEntry =
+    this ?: WrpHostMessageResStart.HeaderEntry.defaultInstance
 
-private fun WrpHostMessageResStart.HeaderEntry.protoMergeImpl(plus: pbandk.Message?): WrpHostMessageResStart.HeaderEntry = (plus as? WrpHostMessageResStart.HeaderEntry)?.let {
-    it.copy(
+private fun WrpHostMessageResStart.HeaderEntry.protoMergeImpl(plus: pbandk.Message?): WrpHostMessageResStart.HeaderEntry =
+    (plus as? WrpHostMessageResStart.HeaderEntry)?.copy(
         unknownFields = unknownFields + plus.unknownFields
-    )
-} ?: this
+    ) ?: this
 
 @Suppress("UNCHECKED_CAST")
 private fun WrpHostMessageResStart.HeaderEntry.Companion.decodeWithImpl(u: pbandk.MessageDecoder): WrpHostMessageResStart.HeaderEntry {
@@ -834,13 +927,13 @@ private fun WrpHostMessageResStart.HeaderEntry.Companion.decodeWithImpl(u: pband
 
 @pbandk.Export
 @pbandk.JsName("orDefaultForWrpHostMessageResPayload")
-public fun WrpHostMessageResPayload?.orDefault(): dev.pbkit.wrp.WrpHostMessageResPayload = this ?: WrpHostMessageResPayload.defaultInstance
+fun WrpHostMessageResPayload?.orDefault(): WrpHostMessageResPayload =
+    this ?: WrpHostMessageResPayload.defaultInstance
 
-private fun WrpHostMessageResPayload.protoMergeImpl(plus: pbandk.Message?): WrpHostMessageResPayload = (plus as? WrpHostMessageResPayload)?.let {
-    it.copy(
+private fun WrpHostMessageResPayload.protoMergeImpl(plus: pbandk.Message?): WrpHostMessageResPayload =
+    (plus as? WrpHostMessageResPayload)?.copy(
         unknownFields = unknownFields + plus.unknownFields
-    )
-} ?: this
+    ) ?: this
 
 @Suppress("UNCHECKED_CAST")
 private fun WrpHostMessageResPayload.Companion.decodeWithImpl(u: pbandk.MessageDecoder): WrpHostMessageResPayload {
@@ -858,14 +951,14 @@ private fun WrpHostMessageResPayload.Companion.decodeWithImpl(u: pbandk.MessageD
 
 @pbandk.Export
 @pbandk.JsName("orDefaultForWrpHostMessageResFinish")
-public fun WrpHostMessageResFinish?.orDefault(): dev.pbkit.wrp.WrpHostMessageResFinish = this ?: WrpHostMessageResFinish.defaultInstance
+fun WrpHostMessageResFinish?.orDefault(): WrpHostMessageResFinish =
+    this ?: WrpHostMessageResFinish.defaultInstance
 
-private fun WrpHostMessageResFinish.protoMergeImpl(plus: pbandk.Message?): WrpHostMessageResFinish = (plus as? WrpHostMessageResFinish)?.let {
-    it.copy(
+private fun WrpHostMessageResFinish.protoMergeImpl(plus: pbandk.Message?): WrpHostMessageResFinish =
+    (plus as? WrpHostMessageResFinish)?.copy(
         trailer = trailer + plus.trailer,
         unknownFields = unknownFields + plus.unknownFields
-    )
-} ?: this
+    ) ?: this
 
 @Suppress("UNCHECKED_CAST")
 private fun WrpHostMessageResFinish.Companion.decodeWithImpl(u: pbandk.MessageDecoder): WrpHostMessageResFinish {
@@ -875,7 +968,8 @@ private fun WrpHostMessageResFinish.Companion.decodeWithImpl(u: pbandk.MessageDe
     val unknownFields = u.readMessage(this) { _fieldNumber, _fieldValue ->
         when (_fieldNumber) {
             1 -> reqId = _fieldValue as String
-            2 -> trailer = (trailer ?: pbandk.MessageMap.Builder()).apply { this.entries += _fieldValue as Sequence<pbandk.MessageMap.Entry<String, String>> }
+            2 -> trailer = (trailer
+                ?: pbandk.MessageMap.Builder()).apply { this.entries += _fieldValue as Sequence<pbandk.MessageMap.Entry<String, String>> }
         }
     }
     return WrpHostMessageResFinish(reqId, pbandk.MessageMap.Builder.fixed(trailer), unknownFields)
@@ -883,13 +977,13 @@ private fun WrpHostMessageResFinish.Companion.decodeWithImpl(u: pbandk.MessageDe
 
 @pbandk.Export
 @pbandk.JsName("orDefaultForWrpHostMessageResFinishTrailerEntry")
-public fun WrpHostMessageResFinish.TrailerEntry?.orDefault(): dev.pbkit.wrp.WrpHostMessageResFinish.TrailerEntry = this ?: WrpHostMessageResFinish.TrailerEntry.defaultInstance
+fun WrpHostMessageResFinish.TrailerEntry?.orDefault(): WrpHostMessageResFinish.TrailerEntry =
+    this ?: WrpHostMessageResFinish.TrailerEntry.defaultInstance
 
-private fun WrpHostMessageResFinish.TrailerEntry.protoMergeImpl(plus: pbandk.Message?): WrpHostMessageResFinish.TrailerEntry = (plus as? WrpHostMessageResFinish.TrailerEntry)?.let {
-    it.copy(
+private fun WrpHostMessageResFinish.TrailerEntry.protoMergeImpl(plus: pbandk.Message?): WrpHostMessageResFinish.TrailerEntry =
+    (plus as? WrpHostMessageResFinish.TrailerEntry)?.copy(
         unknownFields = unknownFields + plus.unknownFields
-    )
-} ?: this
+    ) ?: this
 
 @Suppress("UNCHECKED_CAST")
 private fun WrpHostMessageResFinish.TrailerEntry.Companion.decodeWithImpl(u: pbandk.MessageDecoder): WrpHostMessageResFinish.TrailerEntry {
@@ -907,14 +1001,14 @@ private fun WrpHostMessageResFinish.TrailerEntry.Companion.decodeWithImpl(u: pba
 
 @pbandk.Export
 @pbandk.JsName("orDefaultForWrpGuestMessageReqStart")
-public fun WrpGuestMessageReqStart?.orDefault(): dev.pbkit.wrp.WrpGuestMessageReqStart = this ?: WrpGuestMessageReqStart.defaultInstance
+fun WrpGuestMessageReqStart?.orDefault(): WrpGuestMessageReqStart =
+    this ?: WrpGuestMessageReqStart.defaultInstance
 
-private fun WrpGuestMessageReqStart.protoMergeImpl(plus: pbandk.Message?): WrpGuestMessageReqStart = (plus as? WrpGuestMessageReqStart)?.let {
-    it.copy(
+private fun WrpGuestMessageReqStart.protoMergeImpl(plus: pbandk.Message?): WrpGuestMessageReqStart =
+    (plus as? WrpGuestMessageReqStart)?.copy(
         metadata = metadata + plus.metadata,
         unknownFields = unknownFields + plus.unknownFields
-    )
-} ?: this
+    ) ?: this
 
 @Suppress("UNCHECKED_CAST")
 private fun WrpGuestMessageReqStart.Companion.decodeWithImpl(u: pbandk.MessageDecoder): WrpGuestMessageReqStart {
@@ -926,21 +1020,27 @@ private fun WrpGuestMessageReqStart.Companion.decodeWithImpl(u: pbandk.MessageDe
         when (_fieldNumber) {
             1 -> reqId = _fieldValue as String
             2 -> methodName = _fieldValue as String
-            3 -> metadata = (metadata ?: pbandk.MessageMap.Builder()).apply { this.entries += _fieldValue as Sequence<pbandk.MessageMap.Entry<String, String>> }
+            3 -> metadata = (metadata
+                ?: pbandk.MessageMap.Builder()).apply { this.entries += _fieldValue as Sequence<pbandk.MessageMap.Entry<String, String>> }
         }
     }
-    return WrpGuestMessageReqStart(reqId, methodName, pbandk.MessageMap.Builder.fixed(metadata), unknownFields)
+    return WrpGuestMessageReqStart(
+        reqId,
+        methodName,
+        pbandk.MessageMap.Builder.fixed(metadata),
+        unknownFields
+    )
 }
 
 @pbandk.Export
 @pbandk.JsName("orDefaultForWrpGuestMessageReqStartMetadataEntry")
-public fun WrpGuestMessageReqStart.MetadataEntry?.orDefault(): dev.pbkit.wrp.WrpGuestMessageReqStart.MetadataEntry = this ?: WrpGuestMessageReqStart.MetadataEntry.defaultInstance
+fun WrpGuestMessageReqStart.MetadataEntry?.orDefault(): WrpGuestMessageReqStart.MetadataEntry =
+    this ?: WrpGuestMessageReqStart.MetadataEntry.defaultInstance
 
-private fun WrpGuestMessageReqStart.MetadataEntry.protoMergeImpl(plus: pbandk.Message?): WrpGuestMessageReqStart.MetadataEntry = (plus as? WrpGuestMessageReqStart.MetadataEntry)?.let {
-    it.copy(
+private fun WrpGuestMessageReqStart.MetadataEntry.protoMergeImpl(plus: pbandk.Message?): WrpGuestMessageReqStart.MetadataEntry =
+    (plus as? WrpGuestMessageReqStart.MetadataEntry)?.copy(
         unknownFields = unknownFields + plus.unknownFields
-    )
-} ?: this
+    ) ?: this
 
 @Suppress("UNCHECKED_CAST")
 private fun WrpGuestMessageReqStart.MetadataEntry.Companion.decodeWithImpl(u: pbandk.MessageDecoder): WrpGuestMessageReqStart.MetadataEntry {
@@ -958,13 +1058,13 @@ private fun WrpGuestMessageReqStart.MetadataEntry.Companion.decodeWithImpl(u: pb
 
 @pbandk.Export
 @pbandk.JsName("orDefaultForWrpGuestMessageReqPayload")
-public fun WrpGuestMessageReqPayload?.orDefault(): dev.pbkit.wrp.WrpGuestMessageReqPayload = this ?: WrpGuestMessageReqPayload.defaultInstance
+fun WrpGuestMessageReqPayload?.orDefault(): WrpGuestMessageReqPayload =
+    this ?: WrpGuestMessageReqPayload.defaultInstance
 
-private fun WrpGuestMessageReqPayload.protoMergeImpl(plus: pbandk.Message?): WrpGuestMessageReqPayload = (plus as? WrpGuestMessageReqPayload)?.let {
-    it.copy(
+private fun WrpGuestMessageReqPayload.protoMergeImpl(plus: pbandk.Message?): WrpGuestMessageReqPayload =
+    (plus as? WrpGuestMessageReqPayload)?.copy(
         unknownFields = unknownFields + plus.unknownFields
-    )
-} ?: this
+    ) ?: this
 
 @Suppress("UNCHECKED_CAST")
 private fun WrpGuestMessageReqPayload.Companion.decodeWithImpl(u: pbandk.MessageDecoder): WrpGuestMessageReqPayload {
@@ -982,13 +1082,13 @@ private fun WrpGuestMessageReqPayload.Companion.decodeWithImpl(u: pbandk.Message
 
 @pbandk.Export
 @pbandk.JsName("orDefaultForWrpGuestMessageReqFinish")
-public fun WrpGuestMessageReqFinish?.orDefault(): dev.pbkit.wrp.WrpGuestMessageReqFinish = this ?: WrpGuestMessageReqFinish.defaultInstance
+fun WrpGuestMessageReqFinish?.orDefault(): WrpGuestMessageReqFinish =
+    this ?: WrpGuestMessageReqFinish.defaultInstance
 
-private fun WrpGuestMessageReqFinish.protoMergeImpl(plus: pbandk.Message?): WrpGuestMessageReqFinish = (plus as? WrpGuestMessageReqFinish)?.let {
-    it.copy(
+private fun WrpGuestMessageReqFinish.protoMergeImpl(plus: pbandk.Message?): WrpGuestMessageReqFinish =
+    (plus as? WrpGuestMessageReqFinish)?.copy(
         unknownFields = unknownFields + plus.unknownFields
-    )
-} ?: this
+    ) ?: this
 
 @Suppress("UNCHECKED_CAST")
 private fun WrpGuestMessageReqFinish.Companion.decodeWithImpl(u: pbandk.MessageDecoder): WrpGuestMessageReqFinish {
@@ -1004,13 +1104,13 @@ private fun WrpGuestMessageReqFinish.Companion.decodeWithImpl(u: pbandk.MessageD
 
 @pbandk.Export
 @pbandk.JsName("orDefaultForWrpGuestMessageResFinish")
-public fun WrpGuestMessageResFinish?.orDefault(): dev.pbkit.wrp.WrpGuestMessageResFinish = this ?: WrpGuestMessageResFinish.defaultInstance
+fun WrpGuestMessageResFinish?.orDefault(): WrpGuestMessageResFinish =
+    this ?: WrpGuestMessageResFinish.defaultInstance
 
-private fun WrpGuestMessageResFinish.protoMergeImpl(plus: pbandk.Message?): WrpGuestMessageResFinish = (plus as? WrpGuestMessageResFinish)?.let {
-    it.copy(
+private fun WrpGuestMessageResFinish.protoMergeImpl(plus: pbandk.Message?): WrpGuestMessageResFinish =
+    (plus as? WrpGuestMessageResFinish)?.copy(
         unknownFields = unknownFields + plus.unknownFields
-    )
-} ?: this
+    ) ?: this
 
 @Suppress("UNCHECKED_CAST")
 private fun WrpGuestMessageResFinish.Companion.decodeWithImpl(u: pbandk.MessageDecoder): WrpGuestMessageResFinish {
