@@ -1,6 +1,9 @@
+version = Version.library_webview
+
 plugins {
-    id("com.android.library")
-    id("org.jetbrains.kotlin.android")
+    `android-library`
+    `kotlin-android`
+    `maven-publish`
 }
 
 android {
@@ -35,4 +38,19 @@ dependencies {
     implementation("androidx.appcompat:appcompat:1.4.1")
     implementation("com.google.android.material:material:1.5.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.1")
+}
+
+val sourcesJAR by tasks.registering(Jar::class) {
+    archiveClassifier.set("sources")
+    from(android.sourceSets.getByName("main").java.srcDirs)
+}
+
+publishing {
+    repositories { pbkit(project, "wrp-kt") }
+    publications {
+        register<MavenPublication>(name) {
+            artifact(sourcesJAR)
+            artifact(releaseAAR)
+        }
+    }
 }

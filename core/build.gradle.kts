@@ -1,5 +1,8 @@
+version = Version.library_core
+
 plugins {
     kotlin("jvm")
+    `maven-publish`
 }
 
 dependencies {
@@ -8,5 +11,20 @@ dependencies {
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
-    kotlinOptions.freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
+    kotlinOptions.freeCompilerArgs += "-opt-in=kotlin.RequiresOptIn"
+}
+
+val sourcesJAR by tasks.registering(Jar::class) {
+    archiveClassifier.set("sources")
+    from(sourceSets.getByName("main").java.srcDirs)
+}
+
+publishing {
+    repositories { pbkit(project, "wrp-kt") }
+    publications {
+        register<MavenPublication>(name) {
+            artifact(sourcesJAR)
+            artifact(releaseJAR)
+        }
+    }
 }
