@@ -101,7 +101,7 @@ class Generator : ServiceGenerator {
                         ${interfaceMethods.joinToString("\n                        ")}
                     }
                     
-                    fun serveWrpExampleService(impl: ${service.name}): WrpServer {
+                    fun serveWrp${service.name}(impl: ${service.name}): WrpServer {
                         val availableMethods: Set<String> = setOf(
                             ${availableMethods.joinToString(",\n                            ")}
                         )
