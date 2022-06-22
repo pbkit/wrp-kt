@@ -22,5 +22,5 @@ suspend fun startWrpServer(channel: WrpChannel, vararg servers: WrpServer) {
 }
 
 abstract class WrpServer(val availableMethods: Set<String>) {
-    abstract fun handleRequest(request: WrpRequest)
+    abstract fun handleRequest(request: WrpRequest): Unit
 }
