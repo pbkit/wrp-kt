@@ -57,7 +57,7 @@ protobuf {
         }
     }
     generateProtoTasks {
-        val generator = "${project(":generator").buildDir}/libs/generator.jar"
+        val generator = "${project(":generator").buildDir}/libs/generator-${Version.library_generator}.jar"
         all().forEach { task ->
             task.dependsOn(":generator:jar")
             task.builtins {
