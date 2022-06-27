@@ -123,7 +123,11 @@ class WrpWebView @JvmOverloads constructor(
                 13 -> out.append("\\r") // \r
                 34, 92 -> out.append('\\').append(code.toChar()) // ", \
                 else -> if (code <= 0x1F) {
-                    out.append(String.format("\\u%04x", code))
+                    if (code < 0) {
+                        out.append(String.format("\\x%02x", 0x100 + code))
+                    } else {
+                        out.append(String.format("\\x%02x", code))
+                    }
                 } else {
                     out.append(code.toChar())
                 }
