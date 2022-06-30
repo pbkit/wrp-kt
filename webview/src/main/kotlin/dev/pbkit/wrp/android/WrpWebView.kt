@@ -3,12 +3,16 @@ package dev.pbkit.wrp.android
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
+import android.os.Build
 import android.util.AttributeSet
 import android.webkit.JavascriptInterface
-import android.webkit.JsResult
 import android.webkit.WebChromeClient
+import android.webkit.WebResourceError
+import android.webkit.WebResourceRequest
+import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import androidx.annotation.RequiresApi
 import dev.pbkit.wrp.core.WrpSocket
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
@@ -29,6 +33,7 @@ class WrpWebView @JvmOverloads constructor(
 
     var sessionCounter = 0
     var socketJob: Job? = null
+    private var _webViewClient: WebViewClient? = null
 
     init {
         settings.javaScriptEnabled = true
@@ -36,6 +41,8 @@ class WrpWebView @JvmOverloads constructor(
 
     fun initialize(
         scope: CoroutineScope,
+        webViewClient: WebViewClient? = null,
+        webChromeClient: WebChromeClient = WebChromeClient(),
         onSocketIsReady: suspend (
             webView: WrpWebView,
             socket: WrpSocket,
@@ -45,32 +52,69 @@ class WrpWebView @JvmOverloads constructor(
         val jsInterface = WrpJsInterface(scope)
         addJavascriptInterface(jsInterface, "<android-glue>")
 
-        webChromeClient = object : WebChromeClient() {
-            override fun onJsAlert(
+        this.webChromeClient = webChromeClient
+        webViewClient?.let { this._webViewClient = it }
+
+        object : WebViewClient() {
+            override fun onReceivedError(
                 view: WebView?,
-                url: String?,
-                message: String?,
-                result: JsResult?
-            ): Boolean {
-                return super.onJsAlert(view, url, message, result)
+                request: WebResourceRequest?,
+                error: WebResourceError?
+            ) {
+                super.onReceivedError(view, request, error)
+                _webViewClient?.onReceivedError(view, request, error)
             }
-        }
-        webViewClient = object : WebViewClient() {
+
+            override fun onReceivedHttpError(
+                view: WebView?,
+                request: WebResourceRequest?,
+                errorResponse: WebResourceResponse?
+            ) {
+                super.onReceivedHttpError(view, request, errorResponse)
+                _webViewClient?.onReceivedHttpError(view, request, errorResponse)
+            }
+
+            override fun onPageCommitVisible(view: WebView?, url: String?) {
+                super.onPageCommitVisible(view, url)
+                _webViewClient?.onPageCommitVisible(view, url)
+            }
+
+            @RequiresApi(Build.VERSION_CODES.N)
+            override fun shouldOverrideUrlLoading(
+                view: WebView?,
+                request: WebResourceRequest?
+            ): Boolean {
+                return _webViewClient?.shouldOverrideUrlLoading(view, request)
+                    ?: super.shouldOverrideUrlLoading(view, request)
+            }
+
+            @Deprecated("Deprecated in Java")
+            override fun shouldOverrideUrlLoading(view: WebView?, url: String?): Boolean {
+                return _webViewClient?.shouldOverrideUrlLoading(view, url)
+                    ?: super.shouldOverrideUrlLoading(view, url)
+            }
+
             override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
                 super.onPageStarted(view, url, favicon)
+                _webViewClient?.onPageStarted(view, url, favicon)
                 jsInterface.channel.close()
-                jsInterface.channel = Channel<ByteArray>(Channel.BUFFERED)
+                jsInterface.channel = Channel(Channel.BUFFERED)
                 ++sessionCounter
                 socketJob?.cancel()
+                socketJob = null
             }
 
             override fun onPageFinished(view: WebView?, url: String?) {
                 super.onPageFinished(view, url)
-                if (view == null || url == null) return
+                _webViewClient?.onPageFinished(view, url)
+                if (view == null || url == null || socketJob != null) return
                 val currentSession = sessionCounter
                 socketJob = scope.launch {
                     val handshakeResult = handshake()
-                    if (!handshakeResult) cancel()
+                    if (!handshakeResult) {
+                        cancel()
+                        return@launch
+                    }
                     val currentChannel = jsInterface.channel
                     val socket = object : WrpSocket {
                         override suspend fun read(): ByteArray? {
@@ -91,10 +135,16 @@ class WrpWebView @JvmOverloads constructor(
                     onSocketIsReady(this@WrpWebView, socket, url)
                 }
             }
-        }
+        }.let { super.setWebViewClient(it) }
+    }
+
+    override fun setWebViewClient(webViewClient: WebViewClient) {
+        _webViewClient = webViewClient
     }
 
     suspend fun handshake() = coroutineScope {
+        if (evalJs("globalThis['<android>']") == "true") return@coroutineScope false
+        evalJs("globalThis['<android>'] = true")
         for (i in 1..10) {
             if (evalJs("'<glue>' in globalThis") == "true") {
                 return@coroutineScope true

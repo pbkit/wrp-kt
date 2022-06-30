@@ -1,6 +1,7 @@
 package dev.pbkit.wrp.android.compose
 
-import android.webkit.WebView
+import android.webkit.WebChromeClient
+import android.webkit.WebViewClient
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.viewinterop.AndroidView
@@ -11,7 +12,9 @@ import kotlinx.coroutines.CoroutineScope
 @Composable
 fun WrpWebView(
     scope: CoroutineScope = rememberCoroutineScope(),
-    update: (WebView) -> Unit,
+    update: (WrpWebView) -> Unit,
+    webViewClient: WebViewClient? = null,
+    webChromeClient: WebChromeClient = WebChromeClient(),
     onSocketIsReady: suspend (
         webView: WrpWebView,
         socket: WrpSocket,
@@ -21,7 +24,7 @@ fun WrpWebView(
     AndroidView(
         factory = { context ->
             WrpWebView(context)
-                .apply { initialize(scope, onSocketIsReady) }
+                .apply { initialize(scope, webViewClient, webChromeClient, onSocketIsReady) }
         },
         update = update
     )
