@@ -41,6 +41,8 @@ class WrpWebView @JvmOverloads constructor(
 
     fun initialize(
         scope: CoroutineScope,
+        webViewClient: WebViewClient? = null,
+        webChromeClient: WebChromeClient = WebChromeClient(),
         onSocketIsReady: suspend (
             webView: WrpWebView,
             socket: WrpSocket,
@@ -50,8 +52,10 @@ class WrpWebView @JvmOverloads constructor(
         val jsInterface = WrpJsInterface(scope)
         addJavascriptInterface(jsInterface, "<android-glue>")
 
-        webChromeClient = WebChromeClient()
-        webViewClient = object : WebViewClient() {
+        this.webChromeClient = webChromeClient
+        webViewClient?.let { this._webViewClient = it }
+
+        object : WebViewClient() {
             override fun onReceivedError(
                 view: WebView?,
                 request: WebResourceRequest?,
@@ -103,37 +107,35 @@ class WrpWebView @JvmOverloads constructor(
             override fun onPageFinished(view: WebView?, url: String?) {
                 super.onPageFinished(view, url)
                 _webViewClient?.onPageFinished(view, url)
-                if (view == null || url == null) return
+                if (view == null || url == null || socketJob != null) return
                 val currentSession = sessionCounter
-                if (socketJob == null) {
-                    socketJob = scope.launch {
-                        val handshakeResult = handshake()
-                        if (!handshakeResult) {
-                            cancel()
-                            return@launch
-                        }
-                        val currentChannel = jsInterface.channel
-                        val socket = object : WrpSocket {
-                            override suspend fun read(): ByteArray? {
-                                if (currentSession != sessionCounter) return null
-                                return try {
-                                    currentChannel.receive()
-                                } catch (e: Exception) {
-                                    null
-                                }
-                            }
-
-                            override suspend fun write(p: ByteArray): Boolean {
-                                val payload = ba2str(p)
-                                evalJs("globalThis['<glue>'].recv($payload)")
-                                return true
-                            }
-                        }
-                        onSocketIsReady(this@WrpWebView, socket, url)
+                socketJob = scope.launch {
+                    val handshakeResult = handshake()
+                    if (!handshakeResult) {
+                        cancel()
+                        return@launch
                     }
+                    val currentChannel = jsInterface.channel
+                    val socket = object : WrpSocket {
+                        override suspend fun read(): ByteArray? {
+                            if (currentSession != sessionCounter) return null
+                            return try {
+                                currentChannel.receive()
+                            } catch (e: Exception) {
+                                null
+                            }
+                        }
+
+                        override suspend fun write(p: ByteArray): Boolean {
+                            val payload = ba2str(p)
+                            evalJs("globalThis['<glue>'].recv($payload)")
+                            return true
+                        }
+                    }
+                    onSocketIsReady(this@WrpWebView, socket, url)
                 }
             }
-        }
+        }.let { super.setWebViewClient(it) }
     }
 
     override fun setWebViewClient(webViewClient: WebViewClient) {
