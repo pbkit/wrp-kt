@@ -1,6 +1,5 @@
 package dev.pbkit.wrp.android.compose
 
-import android.webkit.WebView
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.viewinterop.AndroidView
@@ -11,7 +10,7 @@ import kotlinx.coroutines.CoroutineScope
 @Composable
 fun WrpWebView(
     scope: CoroutineScope = rememberCoroutineScope(),
-    update: (WebView) -> Unit,
+    update: (WrpWebView) -> Unit,
     onSocketIsReady: suspend (
         webView: WrpWebView,
         socket: WrpSocket,

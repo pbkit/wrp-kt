@@ -59,7 +59,6 @@ class WrpChannel(private val socket: WrpSocket) {
         val byteBuffer = ByteBuffer.allocate(Int.SIZE_BYTES)
         byteBuffer.order(ByteOrder.LITTLE_ENDIAN)
         val sizeByteArray = byteBuffer.putInt(messageByteArray.size).array()
-        socket.write(sizeByteArray)
-        socket.write(messageByteArray)
+        socket.write(messageByteArray + sizeByteArray)
     }
 }
