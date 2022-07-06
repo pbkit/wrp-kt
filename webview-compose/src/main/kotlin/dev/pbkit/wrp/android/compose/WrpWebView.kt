@@ -4,6 +4,7 @@ import android.webkit.WebChromeClient
 import android.webkit.WebViewClient
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidView
 import dev.pbkit.wrp.android.WrpWebView
 import dev.pbkit.wrp.core.WrpSocket
@@ -19,13 +20,15 @@ fun WrpWebView(
         webView: WrpWebView,
         socket: WrpSocket,
         url: String
-    ) -> Unit
+    ) -> Unit,
+    modifier: Modifier,
 ) {
     AndroidView(
         factory = { context ->
             WrpWebView(context)
                 .apply { initialize(scope, webViewClient, webChromeClient, onSocketIsReady) }
         },
-        update = update
+        update = update,
+        modifier = modifier,
     )
 }
