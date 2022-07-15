@@ -59,7 +59,7 @@ protobuf {
     generateProtoTasks {
         val generator = "${project(":generator").buildDir}/libs/generator-${Version.library_generator}.jar"
         all().forEach { task ->
-            task.dependsOn(":generator:jar")
+            task.dependsOn("preBuild")
             task.builtins {
                 remove("java")
             }
@@ -79,6 +79,7 @@ dependencies {
     protobuf(files("$projectDir/protobuf"))
     implementation(project(":generator"))
     implementation(project(":core"))
+    implementation(project(":webview"))
     implementation(project(":webview-compose"))
     implementation("pro.streem.pbandk:pbandk-runtime:0.13.0")
     implementation("androidx.core:core-ktx:1.7.0")

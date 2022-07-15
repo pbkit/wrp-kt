@@ -44,13 +44,3 @@ val sourcesJAR by tasks.registering(Jar::class) {
     archiveClassifier.set("sources")
     from(android.sourceSets.getByName("main").java.srcDirs)
 }
-
-publishing {
-    repositories { pbkit(project, "wrp-kt") }
-    publications {
-        register<MavenPublication>(name) {
-            artifact(sourcesJAR)
-            artifact(releaseAAR)
-        }
-    }
-}
