@@ -14,7 +14,6 @@
             <option value="$PROJECT_DIR$/buildSrc" />
             <option value="$PROJECT_DIR$/core" />
             <option value="$PROJECT_DIR$/example" />
-            <option value="$PROJECT_DIR$/generator" />
             <option value="$PROJECT_DIR$/webview" />
             <option value="$PROJECT_DIR$/webview-compose" />
           </set>
