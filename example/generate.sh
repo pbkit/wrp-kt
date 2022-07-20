@@ -1,2 +1,2 @@
-generator=`readlink -f ../generator/build/libs/generator.jar`
-protoc --pbandk_out="kotlin_service_gen=$generator|dev.pbkit.wrp.gen.Generator,kotlin_package=dev.pbkit.wrp:src/main/kotlin" protobuf/wrp-example.proto
+protoc --java_out=src/main/kotlin --kotlin_out=src/main/kotlin protobuf/wrp-example.proto
+pb gen wrp-kt -o=src/main/kotlin --service=pbkit.wrp.example.WrpExampleService protobuf/wrp-example.proto

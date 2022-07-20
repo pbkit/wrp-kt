@@ -18,20 +18,22 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.TextFieldValue
-import dev.pbkit.wrp.GetSliderValueRequest
-import dev.pbkit.wrp.GetSliderValueResponse
-import dev.pbkit.wrp.GetTextValueRequest
-import dev.pbkit.wrp.GetTextValueResponse
-import dev.pbkit.wrp.WrpExampleService
 import dev.pbkit.wrp.android.compose.WrpWebView
 import dev.pbkit.wrp.core.WrpChannel
 import dev.pbkit.wrp.core.startWrpServer
-import dev.pbkit.wrp.serveWrpWrpExampleService
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import pbkit.wrp.example.WrpExample.GetSliderValueRequest
+import pbkit.wrp.example.WrpExample.GetSliderValueResponse
+import pbkit.wrp.example.WrpExample.GetTextValueRequest
+import pbkit.wrp.example.WrpExample.GetTextValueResponse
+import pbkit.wrp.example.WrpExampleService
+import pbkit.wrp.example.getSliderValueResponse
+import pbkit.wrp.example.getTextValueResponse
+import pbkit.wrp.example.serveWrpWrpExampleService
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -74,13 +76,15 @@ fun Test() {
                         override suspend fun GetSliderValue(req: GetSliderValueRequest): ReceiveChannel<GetSliderValueResponse> {
                             val channel = Channel<GetSliderValueResponse>()
                             slider
-                                .onEach { channel.send(GetSliderValueResponse(it.toInt())) }
+                                .onEach {
+                                    channel.send(getSliderValueResponse { value = it.toInt() })
+                                }
                                 .launchIn(scope)
                             return channel
                         }
 
                         override suspend fun GetTextValue(req: GetTextValueRequest): GetTextValueResponse {
-                            return GetTextValueResponse(inputText.value.text)
+                            return getTextValueResponse { text = inputText.value.text }
                         }
                     })
                 )
