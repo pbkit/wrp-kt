@@ -31,6 +31,7 @@ import pbkit.wrp.example.WrpExample.GetSliderValueResponse
 import pbkit.wrp.example.WrpExample.GetTextValueRequest
 import pbkit.wrp.example.WrpExample.GetTextValueResponse
 import pbkit.wrp.example.WrpExampleService
+import pbkit.wrp.example.WrpWrpExampleService
 import pbkit.wrp.example.getSliderValueResponse
 import pbkit.wrp.example.getTextValueResponse
 import pbkit.wrp.example.serveWrpWrpExampleService
@@ -69,9 +70,13 @@ fun Test() {
                 webView.loadUrl("https://pbkit.dev/wrp-example-guest")
             },
             onSocketIsReady = { _, socket, url ->
-                Log.d("Wrp", "Socket is ready: $url")
+                Log.d("Wrp", "Wrp socket is ready: $url")
                 startWrpServer(
                     WrpChannel(socket),
+                    { wrpGuest ->
+                        val serviceClient = WrpWrpExampleService(wrpGuest)
+                        serviceClient.GetTextValue(GetTextValueRequest.getDefaultInstance())
+                    },
                     serveWrpWrpExampleService(object : WrpExampleService {
                         override suspend fun GetSliderValue(req: GetSliderValueRequest): ReceiveChannel<GetSliderValueResponse> {
                             val channel = Channel<GetSliderValueResponse>()
