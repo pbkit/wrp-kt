@@ -23,13 +23,13 @@ class WrpWrpExampleService constructor(private val wrpGuest: WrpGuest) : WrpExam
                 reqChannel.close()
             }
             wrpGuest.request(
-,                "pbkit.wrp.example.WrpExampleService/GetTextValue",
-,                reqChannel,
-,                mapOf(),
-,                {},
-,                { payload -> res = pbkit.wrp.example.WrpExample.GetTextValueResponse.parseFrom(payload) },
-,                {}
-,            )
+                "pbkit.wrp.example.WrpExampleService/GetTextValue",
+                reqChannel,
+                mapOf(),
+                {},
+                { payload -> res = pbkit.wrp.example.WrpExample.GetTextValueResponse.parseFrom(payload) },
+                {}
+            )
         }
         return res!!
     }
@@ -42,15 +42,15 @@ class WrpWrpExampleService constructor(private val wrpGuest: WrpGuest) : WrpExam
                 reqChannel.close()
             }
             launch {
-,                wrpGuest.request(
-,                    "pbkit.wrp.example.WrpExampleService/GetSliderValue",
-,                    reqChannel,
-,                    mapOf(),
-,                    {},
-,                    { payload -> resChannel.send(pbkit.wrp.example.WrpExample.GetSliderValueResponse.parseFrom(payload)) },
-,                    {}
-,                )
-,            }
+                wrpGuest.request(
+                    "pbkit.wrp.example.WrpExampleService/GetSliderValue",
+                    reqChannel,
+                    mapOf(),
+                    {},
+                    { payload -> resChannel.send(pbkit.wrp.example.WrpExample.GetSliderValueResponse.parseFrom(payload)) },
+                    {}
+                )
+            }
         }
         return resChannel
     }
