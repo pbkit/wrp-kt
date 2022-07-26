@@ -1,5 +1,6 @@
 package pbkit.wrp.example
 
+import android.util.Log
 import dev.pbkit.wrp.core.WrpGuest
 import dev.pbkit.wrp.core.WrpRequest
 import dev.pbkit.wrp.core.WrpServer
@@ -8,7 +9,10 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.async
+import kotlinx.coroutines.runBlocking
 
 interface WrpExampleService {
     suspend fun GetTextValue(req: pbkit.wrp.example.WrpExample.GetTextValueRequest): pbkit.wrp.example.WrpExample.GetTextValueResponse
@@ -16,35 +20,47 @@ interface WrpExampleService {
 }
 
 class WrpWrpExampleService constructor(private val wrpGuest: WrpGuest) : WrpExampleService {
-    override suspend fun GetTextValue(req: pbkit.wrp.example.WrpExample.GetTextValueRequest): pbkit.wrp.example.WrpExample.GetTextValueResponse {
+    override suspend fun GetTextValue(req: WrpExample.GetTextValueRequest): WrpExample.GetTextValueResponse {
         val reqChannel = Channel<ByteArray>()
-        var resCont: Continuation<WrpExample.GetTextValueResponse>? = null
-        wrpGuest.request(
-            "pbkit.wrp.example.WrpExampleService/GetTextValue",
-            reqChannel,
-            mapOf(),
-            {},
-            { payload -> resCont?.resume(WrpExample.GetTextValueResponse.parseFrom(payload)) },
-            {}
-        )
-        reqChannel.send(req.toByteArray())
-        reqChannel.close()
-        return suspendCoroutine<WrpExample.GetTextValueResponse> { resCont = it }
+        var res: WrpExample.GetTextValueResponse? = null
+        coroutineScope {
+            launch {
+                reqChannel.send(req.toByteArray())
+                reqChannel.close()
+            }
+            wrpGuest.request(
+                "pbkit.wrp.example.WrpExampleService/GetTextValue",
+                reqChannel,
+                mapOf(),
+                {},
+                { payload ->
+                    res = WrpExample.GetTextValueResponse.parseFrom(payload)
+                },
+                {}
+            )
+        }
+        return res!!
     }
 
     override suspend fun GetSliderValue(req: pbkit.wrp.example.WrpExample.GetSliderValueRequest): ReceiveChannel<pbkit.wrp.example.WrpExample.GetSliderValueResponse> {
         val reqChannel = Channel<ByteArray>()
-        var resChannel = Channel<WrpExample.GetSliderValueResponse>()
-        wrpGuest.request(
-            "pbkit.wrp.example.WrpExampleService/GetSliderValue",
-            reqChannel,
-            mapOf(),
-            {},
-            { payload -> resChannel.send(WrpExample.GetSliderValueResponse.parseFrom(payload)) },
-            {}
-        )
-        reqChannel.send(req.toByteArray())
-        reqChannel.close()
+        val resChannel = Channel<WrpExample.GetSliderValueResponse>()
+        coroutineScope {
+            launch {
+                reqChannel.send(req.toByteArray())
+                reqChannel.close()
+            }
+            launch {
+                wrpGuest.request(
+                    "pbkit.wrp.example.WrpExampleService/GetSliderValue",
+                    reqChannel,
+                    mapOf(),
+                    {},
+                    { payload -> resChannel.send(WrpExample.GetSliderValueResponse.parseFrom(payload)) },
+                    {}
+                )
+            }
+        }
         return resChannel
     }
 }
