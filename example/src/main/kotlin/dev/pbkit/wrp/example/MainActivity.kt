@@ -106,14 +106,14 @@ fun Test() {
         }
         Button(onClick = {
             scope.launch {
-                textResp.value = client.value?.GetTextValue(GetTextValueRequest.getDefaultInstance())?.text ?: ""
+                textResp.value = client.value?.getTextValue(GetTextValueRequest.getDefaultInstance())?.text ?: ""
             }
         }, shape = RectangleShape) {
             Text(text = "Get TextValue from Server (from WebView)")
         }
         Button(onClick = {
              scope.launch {
-                 client.value?.GetSliderValue(GetSliderValueRequest.getDefaultInstance())?.consumeEach { sliderResp.value = it.value }
+                 client.value?.getSliderValue(GetSliderValueRequest.getDefaultInstance())?.consumeEach { sliderResp.value = it.value }
              }
         }, shape = RectangleShape) {
             Text(text = "Get SliderValue from Server (from WebView)")
@@ -133,7 +133,7 @@ fun Test() {
                         Log.d("Wrp", "Wrp client is ready")
                     },
                     serveWrpWrpExampleService(object : WrpExampleService {
-                        override suspend fun GetSliderValue(req: GetSliderValueRequest): ReceiveChannel<GetSliderValueResponse> {
+                        override suspend fun getSliderValue(req: GetSliderValueRequest): ReceiveChannel<GetSliderValueResponse> {
                             val channel = Channel<GetSliderValueResponse>()
                             slider
                                 .onEach {
@@ -143,7 +143,7 @@ fun Test() {
                             return channel
                         }
 
-                        override suspend fun GetTextValue(req: GetTextValueRequest): GetTextValueResponse {
+                        override suspend fun getTextValue(req: GetTextValueRequest): GetTextValueResponse {
                             return getTextValueResponse { text = inputText.value.text }
                         }
                     })

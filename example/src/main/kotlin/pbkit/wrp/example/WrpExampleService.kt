@@ -9,12 +9,12 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 
 interface WrpExampleService {
-    suspend fun GetTextValue(req: pbkit.wrp.example.WrpExample.GetTextValueRequest): pbkit.wrp.example.WrpExample.GetTextValueResponse
-    suspend fun GetSliderValue(req: pbkit.wrp.example.WrpExample.GetSliderValueRequest): ReceiveChannel<pbkit.wrp.example.WrpExample.GetSliderValueResponse>
+    suspend fun getTextValue(req: pbkit.wrp.example.WrpExample.GetTextValueRequest): pbkit.wrp.example.WrpExample.GetTextValueResponse
+    suspend fun getSliderValue(req: pbkit.wrp.example.WrpExample.GetSliderValueRequest): ReceiveChannel<pbkit.wrp.example.WrpExample.GetSliderValueResponse>
 }
 
 class WrpWrpExampleService constructor(private val wrpGuest: WrpGuest) : WrpExampleService {
-    override suspend fun GetTextValue(req: pbkit.wrp.example.WrpExample.GetTextValueRequest): pbkit.wrp.example.WrpExample.GetTextValueResponse {
+    override suspend fun getTextValue(req: pbkit.wrp.example.WrpExample.GetTextValueRequest): pbkit.wrp.example.WrpExample.GetTextValueResponse {
         val reqChannel = Channel<ByteArray>()
         var res: pbkit.wrp.example.WrpExample.GetTextValueResponse? = null
         coroutineScope {
@@ -33,7 +33,7 @@ class WrpWrpExampleService constructor(private val wrpGuest: WrpGuest) : WrpExam
         }
         return res!!
     }
-    override suspend fun GetSliderValue(req: pbkit.wrp.example.WrpExample.GetSliderValueRequest): ReceiveChannel<pbkit.wrp.example.WrpExample.GetSliderValueResponse> {
+    override suspend fun getSliderValue(req: pbkit.wrp.example.WrpExample.GetSliderValueRequest): ReceiveChannel<pbkit.wrp.example.WrpExample.GetSliderValueResponse> {
         val reqChannel = Channel<ByteArray>()
         val resChannel = Channel<pbkit.wrp.example.WrpExample.GetSliderValueResponse>()
         coroutineScope {
@@ -70,7 +70,7 @@ fun serveWrpWrpExampleService(impl: WrpExampleService): WrpServer {
                         "pbkit.wrp.example.WrpExampleService/GetTextValue" -> {
                             for (byteArray in request.req) {
                                 val req = pbkit.wrp.example.WrpExample.GetTextValueRequest.parseFrom(byteArray)
-                                val res = impl.GetTextValue(req).toByteArray()
+                                val res = impl.getTextValue(req).toByteArray()
                                 request.sendPayload(res)
                                 request.req.close()
                                 break
@@ -79,7 +79,7 @@ fun serveWrpWrpExampleService(impl: WrpExampleService): WrpServer {
                         "pbkit.wrp.example.WrpExampleService/GetSliderValue" -> {
                             for (byteArray in request.req) {
                                 val req = pbkit.wrp.example.WrpExample.GetSliderValueRequest.parseFrom(byteArray)
-                                for (res in impl.GetSliderValue(req)) {
+                                for (res in impl.getSliderValue(req)) {
                                     request.sendPayload(res.toByteArray())
                                 }
                                 request.req.close()
