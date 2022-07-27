@@ -7,6 +7,7 @@ import dev.pbkit.wrp.WrpHostMessageResFinish
 import dev.pbkit.wrp.WrpHostMessageResPayload
 import dev.pbkit.wrp.WrpHostMessageResStart
 import dev.pbkit.wrp.WrpMessage
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.coroutineScope
@@ -58,76 +59,80 @@ suspend fun startWrpServer(
 
     val guestState = GuestState()
     coroutineScope {
-        channel.listen(this).onStart { host.start() }.collect { message ->
-            when (val msg = message.message) {
-                null -> host.receivedNull()
-                is WrpMessage.Message.GuestReqStart -> {
-                    val request = host.guestReqStart(this, msg)
-                    methodServerMap[request.methodName]?.handleRequest(request)
-                }
-                is WrpMessage.Message.GuestReqPayload -> host.guestReqPayload(msg)
-                is WrpMessage.Message.GuestReqFinish -> host.guestReqFinish(msg)
-                is WrpMessage.Message.GuestResFinish -> host.guestResFinish(msg)
-                is WrpMessage.Message.HostError -> onHostError(WrpError(msg.value.message))
-                is WrpMessage.Message.HostInitialize -> this.launch {
-                    onGuestIsReady(object : WrpGuest {
-                        override val availableMethods: Set<String> = msg.value.availableMethods.toSet()
+        channel.listen(this)
+            .onStart { this@coroutineScope.launch { host.start() } }
+            .collect { message ->
+                when (val msg = message.message) {
+                    null -> host.receivedNull()
+                    is WrpMessage.Message.GuestReqStart -> {
+                        val request = host.guestReqStart(this, msg)
+                        methodServerMap[request.methodName]?.handleRequest(request)
+                    }
+                    is WrpMessage.Message.GuestReqPayload -> host.guestReqPayload(msg)
+                    is WrpMessage.Message.GuestReqFinish -> host.guestReqFinish(msg)
+                    is WrpMessage.Message.GuestResFinish -> host.guestResFinish(msg)
+                    is WrpMessage.Message.HostError -> onHostError(WrpError(msg.value.message))
+                    is WrpMessage.Message.HostInitialize -> this.launch {
+                        onGuestIsReady(object : WrpGuest {
+                            override val availableMethods: Set<String> =
+                                msg.value.availableMethods.toSet()
 
-                        override suspend fun request(
-                            methodName: String,
-                            req: Channel<ByteArray>,
-                            metadata: Metadata,
-                            onHeader: suspend (header: Metadata) -> Unit,
-                            onPayload: suspend (payload: ByteArray) -> Unit,
-                            onTrailer: suspend (trailer: Metadata) -> Unit
-                        ) {
-                            val reqId = (guestState.reqCounter++).toString()
-                            guestState.requests[reqId] = GuestRequest(onHeader, onPayload, onTrailer)
-                            channel.send(
-                                WrpMessage(
-                                    WrpMessage.Message.GuestReqStart(
-                                        WrpGuestMessageReqStart(reqId, methodName, metadata)
-                                    )
-                                )
-                            )
-                            for (byteArray in req) {
+                            override suspend fun request(
+                                methodName: String,
+                                req: Channel<ByteArray>,
+                                metadata: Metadata,
+                                onHeader: suspend (header: Metadata) -> Unit,
+                                onPayload: suspend (payload: ByteArray) -> Unit,
+                                onTrailer: suspend (trailer: Metadata) -> Unit
+                            ) {
+                                val reqId = (guestState.reqCounter++).toString()
+                                guestState.requests[reqId] =
+                                    GuestRequest(onHeader, onPayload, onTrailer)
                                 channel.send(
                                     WrpMessage(
-                                        WrpMessage.Message.GuestReqPayload(
-                                            WrpGuestMessageReqPayload(reqId, ByteArr(byteArray))
+                                        WrpMessage.Message.GuestReqStart(
+                                            WrpGuestMessageReqStart(reqId, methodName, metadata)
+                                        )
+                                    )
+                                )
+                                for (byteArray in req) {
+                                    channel.send(
+                                        WrpMessage(
+                                            WrpMessage.Message.GuestReqPayload(
+                                                WrpGuestMessageReqPayload(reqId, ByteArr(byteArray))
+                                            )
+                                        )
+                                    )
+                                }
+                                channel.send(
+                                    WrpMessage(
+                                        WrpMessage.Message.GuestReqFinish(
+                                            WrpGuestMessageReqFinish(reqId)
                                         )
                                     )
                                 )
                             }
-                            channel.send(
-                                WrpMessage(
-                                    WrpMessage.Message.GuestReqFinish(
-                                        WrpGuestMessageReqFinish(reqId)
-                                    )
-                                )
-                            )
-                        }
-                    })
-                }
-                is WrpMessage.Message.HostResStart -> {
-                    val (reqId, header) = msg.value
-                    val request = guestState.requests[reqId] ?: return@collect
-                    request.onHeader(header)
-                }
-                is WrpMessage.Message.HostResPayload -> {
-                    val (reqId, value) = msg.value
-                    val request = guestState.requests[reqId] ?: return@collect
-                    request.onPayload(value.array)
-                }
-                is WrpMessage.Message.HostResFinish -> {
-                    val (reqId, trailer) = msg.value
-                    val request = guestState.requests[reqId] ?: return@collect
-                    guestState.requests.remove(reqId)
-                    request.onTrailer(trailer)
-                    if (trailer["wrp-status"] != "ok") throw WrpError(trailer["wrp-message"] ?: "")
+                        })
+                    }
+                    is WrpMessage.Message.HostResStart -> {
+                        val (reqId, header) = msg.value
+                        val request = guestState.requests[reqId] ?: return@collect
+                        request.onHeader(header)
+                    }
+                    is WrpMessage.Message.HostResPayload -> {
+                        val (reqId, value) = msg.value
+                        val request = guestState.requests[reqId] ?: return@collect
+                        request.onPayload(value.array)
+                    }
+                    is WrpMessage.Message.HostResFinish -> {
+                        val (reqId, trailer) = msg.value
+                        val request = guestState.requests[reqId] ?: return@collect
+                        guestState.requests.remove(reqId)
+                        request.onTrailer(trailer)
+                        if (trailer["wrp-status"] != "ok") throw WrpError(trailer["wrp-message"] ?: "")
+                    }
                 }
             }
-        }
     }
 }
 
